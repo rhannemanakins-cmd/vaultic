@@ -542,7 +542,7 @@ def register(request):
 def export_transactions_csv(request):
     # 1. Create the response object and tell the browser it's a CSV file downloading
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="vaultic_ledger.csv"'
+    response['Content-Disposition'] = 'attachment; filename="tilly_finance_ledger.csv"'
 
     # 2. Set up the CSV writer
     writer = csv.writer(response)
