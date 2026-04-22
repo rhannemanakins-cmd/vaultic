@@ -1,0 +1,31 @@
+{% extends 'finances/base.html' %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+    <div class="card" style="width: 100%; max-width: 450px; text-align: center; border-top: 4px solid var(--brand-danger);">
+        
+        <div style="background: #fee2e2; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px;">
+            <span style="font-size: 24px;">⚠️</span>
+        </div>
+        <h2 style="color: #0f172a; margin-bottom: 10px;">Delete Transaction?</h2>
+        <p style="color: var(--text-light); margin-bottom: 25px;">Are you sure you want to permanently delete this record? This will immediately affect your Total Balance and monthly charts.</p>
+
+        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #e2e8f0; text-align: left;">
+            <p style="margin: 0; color: var(--text-main);"><strong>Vendor:</strong> {{ transaction.vendor }}</p>
+            <p style="margin: 5px 0 0; color: var(--text-main);"><strong>Date:</strong> {{ transaction.date }}</p>
+            <p style="margin: 5px 0 0; color: var(--brand-danger); font-weight: 700;"><strong>Amount:</strong> ${{ transaction.total_amount|floatformat:2 }}</p>
+        </div>
+
+        <form method="post" style="display: flex; gap: 10px;">
+            {% csrf_token %}
+            <a href="javascript:history.back()" style="flex: 1; padding: 12px; background: white; color: var(--text-main); text-decoration: none; border-radius: 8px; font-weight: 600; border: 1px solid #cbd5e1; transition: background 0.2s;">
+                Cancel
+            </a>
+            <button type="submit" style="flex: 1; padding: 12px; background: var(--brand-danger); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
+                Yes, Delete It
+            </button>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

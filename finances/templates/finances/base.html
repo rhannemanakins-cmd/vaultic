@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaultic Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================
+           1. THE DESIGN SYSTEM (Variables)
+           ========================================== */
+        :root {
+            --bg-body: #f4f7f6;
+            --bg-sidebar: #1e293b;
+            --bg-card: #ffffff;
+            
+            --text-main: #334155;
+            --text-light: #94a3b8;
+            --text-sidebar: #cbd5e1;
+            
+            --brand-primary: #3b82f6; 
+            --brand-success: #10b981; 
+            --brand-danger: #ef4444;  
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --radius: 12px;
+        }
+
+        /* ==========================================
+           2. GLOBAL RESETS
+           ========================================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex; 
+            min-height: 100vh; 
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 { color: #0f172a; font-weight: 700; letter-spacing: -0.5px; }
+
+        /* ==========================================
+           3. THE SIDEBAR (Navigation)
+           ========================================== */
+        nav { 
+            width: 260px; 
+            background: var(--bg-sidebar); 
+            color: white; 
+            padding: 30px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        
+        nav a { 
+            color: var(--text-sidebar); 
+            display: block; 
+            padding: 12px 15px; 
+            text-decoration: none; 
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        nav a:hover { 
+            background: rgba(255,255,255,0.1); 
+            color: white; 
+            transform: translateX(4px);
+        }
+
+        /* ==========================================
+           4. MAIN CONTENT & CARDS
+           ========================================== */
+        main { 
+            flex-grow: 1; 
+            padding: 40px 60px; 
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .card { 
+            background: var(--bg-card); 
+            padding: 25px; 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow-md); 
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        /* ==========================================
+           5. FORMS & BUTTONS
+           ========================================== */
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            margin-top: 4px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-primary { background: var(--brand-primary); color: white; }
+        .btn-success { background: var(--brand-success); color: white; }
+        .btn-danger { background: var(--brand-danger); color: white; }
+        
+        .auth-section { margin-top: auto; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .auth-btn { display: block; width: 100%; padding: 12px; text-align: center; text-decoration: none; border-radius: 8px; font-weight: 600; margin-bottom: 10px; transition: opacity 0.2s; border: none; cursor: pointer; font-size: 14px;}
+        .auth-btn:hover { opacity: 0.9; }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <div>
+            <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -1px; margin-top: 0; margin-bottom: 30px; color: white; padding-left: 10px;"><span style="color: var(--brand-primary);">V</span>aultic<span style="color: var(--brand-primary);">.</span></h2>
+            
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'budgets' %}">Budgets</a>
+            <a href="{% url 'debts' %}">Debt Tracker</a>
+            <a href="{% url 'expenses' %}">Expenses</a>
+            <a href="{% url 'income' %}">Income</a>
+            <a href="{% url 'savings' %}">Savings Goals</a>
+            <a href="{% url 'transaction_list' %}">Transactions</a> 
+        </div>
+
+        <div class="auth-section">
+            {% if user.is_authenticated %}
+                <p style="color: var(--text-sidebar); font-size: 13px; margin-bottom: 15px; padding-left: 10px;">
+                    Welcome back,<br><span style="color: white; font-size: 16px; font-weight: 600;">{{ user.userprofile.preferred_name|default:user.username }}</span>
+                </p>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="auth-btn btn-danger">Secure Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="auth-btn btn-primary">Login</a>
+                <a href="{% url 'register' %}" class="auth-btn btn-success">Create Account</a>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>

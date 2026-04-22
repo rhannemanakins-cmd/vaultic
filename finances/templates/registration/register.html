@@ -1,0 +1,20 @@
+{% extends 'finances/base.html' %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="card" style="width: 100%; max-width: 400px; text-align: center; padding: 40px;">
+        <h1 style="color: #2c3e50; margin-bottom: 10px;">Create Account</h1>
+        <p style="color: #7f8c8d; margin-bottom: 30px;">Start taking control of your money today.</p>
+
+        <form method="post" style="text-align: left;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" style="width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;">Create Account</button>
+        </form>
+
+        <p style="margin-top: 25px; color: #7f8c8d;">
+            Already have an account? <a href="{% url 'login' %}" style="color: #3498db; text-decoration: none; font-weight: bold;">Login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
