@@ -8,7 +8,7 @@
     </div>
     
     <div style="display: flex; gap: 12px;">
-        <a href="{% url 'export_transactions_csv' %}" style="background: white; color: var(--text-main); padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; border: 1px solid #cbd5e1; box-shadow: var(--shadow-sm); transition: background 0.2s;">
+        <a href="{% url 'export_transactions_csv' %}" style="background: var(--bg-card); color: var(--text-main); padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); transition: background 0.2s;">
             ↓ Download CSV
         </a>
         <a href="{% url 'add_transaction' %}" style="background: var(--brand-primary); color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: var(--shadow-sm); transition: opacity 0.2s;">
@@ -17,11 +17,11 @@
     </div>
 </div>
 
-<div class="card">
+<div class="card" style="background: var(--bg-card); border-radius: 12px; box-shadow: var(--shadow-sm); padding: 20px;">
     <div style="overflow-x: auto;">
         <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
-                <tr style="border-bottom: 2px solid #f1f5f9;">
+                <tr style="border-bottom: 2px solid var(--border-color);">
                     <th style="padding: 12px 15px; color: var(--text-light); font-weight: 600; font-size: 13px; text-transform: uppercase;">Date</th>
                     <th style="padding: 12px 15px; color: var(--text-light); font-weight: 600; font-size: 13px; text-transform: uppercase;">Vendor</th>
                     <th style="padding: 12px 15px; color: var(--text-light); font-weight: 600; font-size: 13px; text-transform: uppercase;">Type</th>
@@ -31,16 +31,16 @@
             </thead>
             <tbody>
                 {% for txn in page_obj %}
-                <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;">
+                <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s;">
                     <td style="padding: 15px; font-size: 14px; color: var(--text-light);">{{ txn.date|date:"M d, Y" }}</td>
-                    <td style="padding: 15px; font-weight: 500;">{{ txn.vendor }}</td>
+                    <td style="padding: 15px; font-weight: 500; color: var(--text-main);">{{ txn.vendor }}</td>
                     <td style="padding: 15px;">
                         {% if txn.transaction_type == 'INCOME' %}
-                            <span style="background: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Income</span>
+                            <span style="background: #E8F5E9; color: #2E7D32; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Income</span>
                         {% elif txn.transaction_type == 'EXPENSE' %}
-                            <span style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Expense</span>
+                            <span style="background: #FCE4EC; color: #C62828; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Expense</span>
                         {% else %}
-                            <span style="background: #e0e7ff; color: #3730a3; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Transfer</span>
+                            <span style="background: #EFEBE9; color: #4E342E; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Transfer</span>
                         {% endif %}
                     </td>
                     <td style="padding: 15px; font-weight: 600; text-align: right; color: var(--text-main);">
@@ -59,18 +59,18 @@
             </tbody>
         </table>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 15px 0; border-top: 1px solid #f1f5f9;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 15px 0; border-top: 1px solid var(--border-color);">
             <span style="color: var(--text-light); font-size: 14px;">
                 Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
             </span>
             
             <div style="display: flex; gap: 10px;">
                 {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}" style="padding: 8px 16px; background: white; color: var(--text-main); border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">&larr; Previous</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" style="padding: 8px 16px; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">&larr; Previous</a>
                 {% endif %}
                 
                 {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}" style="padding: 8px 16px; background: white; color: var(--text-main); border: 1px solid #cbd5e1; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">Next &rarr;</a>
+                    <a href="?page={{ page_obj.next_page_number }}" style="padding: 8px 16px; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">Next &rarr;</a>
                 {% endif %}
             </div>
         </div>
