@@ -1,6 +1,13 @@
 {% extends 'finances/base.html' %}
 
 {% block content %}
+<div style="margin-bottom: 30px;">
+    <h1 style="margin-bottom: 5px;">Financial Overview</h1>
+    <div style="display: flex; align-items: center; gap: 8px; color: var(--text-light); font-size: 14px;">
+        <span style="display: inline-block; width: 8px; height: 8px; background: var(--brand-primary); border-radius: 50%;"></span>
+        Current Period: <strong>{{ start_date|date:"M d" }} — {{ end_date|date:"M d, Y" }}</strong>
+    </div>
+</div>
 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
     <div>
         <h1 style="margin: 0; font-size: 28px;">Dashboard</h1>

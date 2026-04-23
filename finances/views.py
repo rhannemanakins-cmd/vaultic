@@ -29,31 +29,23 @@ from .forms import TransactionForm, BudgetForm, DebtForm, SavingsGoalForm, Exten
 @login_required
 def dashboard(request):
     today = timezone.now().date()
-    first_of_month = today.replace(day=1)
+    # First day of current month
+    start_date = today.replace(day=1)
+    
+    # Last day of current month
+    import calendar
+    last_day = calendar.monthrange(today.year, today.month)[1]
+    end_date = today.replace(day=last_day)
 
-    all_income = Transaction.objects.filter(user=request.user, transaction_type='INCOME').aggregate(total=Sum('total_amount'))['total'] or 0
-    all_expenses = Transaction.objects.filter(user=request.user, transaction_type='EXPENSE').aggregate(total=Sum('total_amount'))['total'] or 0
-    total_balance = all_income - all_expenses
-
-    monthly_income = Transaction.objects.filter(
-        user=request.user, 
-        transaction_type='INCOME', 
-        date__gte=first_of_month
-    ).aggregate(total=Sum('total_amount'))['total'] or 0
-
-    monthly_expenses = Transaction.objects.filter(
-        user=request.user, 
-        transaction_type='EXPENSE', 
-        date__gte=first_of_month
-    ).aggregate(total=Sum('total_amount'))['total'] or 0
-
-    recent_transactions = Transaction.objects.filter(user=request.user).order_by('-date', '-id')[:5]
+    # ... (Keep your income/expense calculation logic here) ...
 
     context = {
         'total_balance': total_balance,
         'monthly_income': monthly_income,
         'monthly_expenses': monthly_expenses,
         'recent_transactions': recent_transactions,
+        'start_date': start_date, # MUST HAVE THIS
+        'end_date': end_date,     # MUST HAVE THIS
     }
     return render(request, 'finances/dashboard.html', context)
 
@@ -396,34 +388,6 @@ def budget_dashboard(request):
         
     return render(request, 'finances/budgets.html', {'budget_data': budget_data})
 # --- Add these to your budget_dashboard and dashboard logic ---
-
-@login_required
-def dashboard(request):
-    today = timezone.now().date()
-    first_of_month = today.replace(day=1)
-    # We create a "last of month" for the UI to show the range
-    import calendar
-    last_day = calendar.monthrange(today.year, today.month)[1]
-    last_of_month = today.replace(day=last_day)
-
-    all_income = Transaction.objects.filter(user=request.user, transaction_type='INCOME').aggregate(total=Sum('total_amount'))['total'] or 0
-    all_expenses = Transaction.objects.filter(user=request.user, transaction_type='EXPENSE').aggregate(total=Sum('total_amount'))['total'] or 0
-    total_balance = all_income - all_expenses
-
-    monthly_income = Transaction.objects.filter(user=request.user, transaction_type='INCOME', date__gte=first_of_month).aggregate(total=Sum('total_amount'))['total'] or 0
-    monthly_expenses = Transaction.objects.filter(user=request.user, transaction_type='EXPENSE', date__gte=first_of_month).aggregate(total=Sum('total_amount'))['total'] or 0
-
-    recent_transactions = Transaction.objects.filter(user=request.user).order_by('-date', '-id')[:5]
-
-    context = {
-        'total_balance': total_balance,
-        'monthly_income': monthly_income,
-        'monthly_expenses': monthly_expenses,
-        'recent_transactions': recent_transactions,
-        'start_date': first_of_month,  # Passed to UI
-        'end_date': last_of_month,      # Passed to UI
-    }
-    return render(request, 'finances/dashboard.html', context)
 
 @login_required
 def budget_dashboard(request):
