@@ -11,27 +11,27 @@
 
     <style>
         /* ==========================================
-           1. THE DESIGN SYSTEM (Variables)
+           1. THE DESIGN SYSTEM (Midnight & Sapphire)
            ========================================== */
         :root {
-            /* Your Custom Brand Colors */
-            --brand-primary: #92684D;   /* The darker warm brown */
-            --bg-card: #DAC5B8;         /* The lighter beige */
+            /* Brand & Accents */
+            --brand-primary: #3B82F6;   /* Vibrant Sapphire Blue */
+            --brand-danger: #EF4444;    /* Bright red for delete */
+            --brand-success: #10B981;   /* Emerald green for success */
             
-            /* Background & Text Fixes */
-            --bg-main: #F7EFEA;         /* Soft wash of beige for main background */
-            --text-main: #2A1A10;       /* Deep espresso (Dark enough to read) */
-            --text-light: #6A4B35;      /* Medium brown for secondary text */
+            /* Backgrounds */
+            --bg-main: #0F172A;         /* Deepest midnight for main background */
+            --bg-card: #1E293B;         /* Slate dark for cards & sidebar */
             
-            /* Accents & UI Elements */
-            --border-color: #C8B1A2;    /* Slightly darker beige for lines */
-            --shadow-sm: 0 4px 6px rgba(42, 26, 16, 0.08);
-            --shadow-md: 0 10px 15px -3px rgba(42, 26, 16, 0.1);
+            /* Typography */
+            --text-main: #F8FAFC;       /* Crisp white for readable text */
+            --text-light: #94A3B8;      /* Muted blue-gray for subtitles/labels */
+            
+            /* UI Elements */
+            --border-color: #334155;    /* Subtle dark border for tables/dividers */
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
             --radius: 12px;
-            
-            /* Button Colors */
-            --brand-danger: #A35245;    /* Warm rust for delete buttons */
-            --brand-success: #6A7B5E;   /* Muted warm green for success buttons */
         }
 
         /* ==========================================
@@ -55,18 +55,18 @@
            ========================================== */
         nav { 
             width: 260px; 
-            background: var(--bg-card); /* Now uses your light beige */
+            background: var(--bg-card); 
             color: var(--text-main); 
             padding: 30px 20px; 
             display: flex; 
             flex-direction: column; 
-            box-shadow: 2px 0 10px rgba(42, 26, 16, 0.05); /* Warmer shadow */
+            box-shadow: var(--shadow-md);
             z-index: 10;
             border-right: 1px solid var(--border-color);
         }
         
         nav a { 
-            color: var(--text-main); /* Ensures links are dark espresso */
+            color: var(--text-light); 
             display: block; 
             padding: 12px 15px; 
             text-decoration: none; 
@@ -77,7 +77,7 @@
         }
         
         nav a:hover { 
-            background: rgba(146, 104, 77, 0.1); /* Slight brown tint on hover */
+            background: rgba(59, 130, 246, 0.1); /* Subtle blue tint */
             color: var(--brand-primary); 
             transform: translateX(4px);
         }
@@ -96,13 +96,9 @@
             background: var(--bg-card); 
             padding: 25px; 
             border-radius: var(--radius); 
-            box-shadow: var(--shadow-md); 
+            box-shadow: var(--shadow-sm); 
             border: 1px solid var(--border-color);
             transition: transform 0.2s ease;
-        }
-
-        .card:hover {
-            box-shadow: 0 10px 15px -3px rgba(42, 26, 16, 0.08);
         }
 
         /* ==========================================
@@ -116,15 +112,15 @@
             font-family: 'Inter', sans-serif;
             margin-top: 4px;
             margin-bottom: 16px;
+            background: var(--bg-main); /* Dark background for inputs */
+            color: var(--text-main);    /* White text when typing */
             transition: border-color 0.2s, box-shadow 0.2s;
-            background: var(--bg-main); /* Ensures inputs stand out slightly */
-            color: var(--text-main);
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: var(--brand-primary);
-            box-shadow: 0 0 0 3px rgba(146, 104, 77, 0.2); /* Brown focus ring */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); 
         }
 
         .btn-primary { background: var(--brand-primary); color: white; }

@@ -36,11 +36,11 @@
                     <td style="padding: 15px; font-weight: 500; color: var(--text-main);">{{ txn.vendor }}</td>
                     <td style="padding: 15px;">
                         {% if txn.transaction_type == 'INCOME' %}
-                            <span style="background: #E8F5E9; color: #2E7D32; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Income</span>
+                            <span style="background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Income</span>
                         {% elif txn.transaction_type == 'EXPENSE' %}
-                            <span style="background: #FCE4EC; color: #C62828; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Expense</span>
+                            <span style="background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Expense</span>
                         {% else %}
-                            <span style="background: #EFEBE9; color: #4E342E; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Transfer</span>
+                            <span style="background: rgba(148, 163, 184, 0.15); color: #CBD5E1; border: 1px solid rgba(148, 163, 184, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">Transfer</span>
                         {% endif %}
                     </td>
                     <td style="padding: 15px; font-weight: 600; text-align: right; color: var(--text-main);">
@@ -66,11 +66,11 @@
             
             <div style="display: flex; gap: 10px;">
                 {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}" style="padding: 8px 16px; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">&larr; Previous</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" style="padding: 8px 16px; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">&larr; Previous</a>
                 {% endif %}
                 
                 {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}" style="padding: 8px 16px; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">Next &rarr;</a>
+                    <a href="?page={{ page_obj.next_page_number }}" style="padding: 8px 16px; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 14px;">Next &rarr;</a>
                 {% endif %}
             </div>
         </div>
