@@ -26,26 +26,23 @@ from .forms import TransactionForm, BudgetForm, DebtForm, SavingsGoalForm, Exten
 # ==========================================
 # MAIN DASHBOARD ENGINE
 # ==========================================
-@login_required
+@@login_required
 def dashboard(request):
-    today = timezone.now().date()
-    # First day of current month
-    start_date = today.replace(day=1)
-    
-    # Last day of current month
     import calendar
+    today = timezone.now().date()
+    start_date = today.replace(day=1)
     last_day = calendar.monthrange(today.year, today.month)[1]
     end_date = today.replace(day=last_day)
 
-    # ... (Keep your income/expense calculation logic here) ...
+    # ... (Your existing balance/income/expense calculations) ...
 
     context = {
         'total_balance': total_balance,
         'monthly_income': monthly_income,
         'monthly_expenses': monthly_expenses,
         'recent_transactions': recent_transactions,
-        'start_date': start_date, # MUST HAVE THIS
-        'end_date': end_date,     # MUST HAVE THIS
+        'start_date': start_date,  # Variable names must match HTML
+        'end_date': end_date,
     }
     return render(request, 'finances/dashboard.html', context)
 
@@ -301,10 +298,78 @@ def expense_analytics(request):
     return render(request, 'finances/expenses.html', context)
 
 @login_required
+@login_required
 def income_analytics(request):
-    # Truncated for space, assume unchanged from your original working code
-    pass # Kept your original logic here in practice, just stripped to save prompt length if it hasn't changed.
-    # (If you need me to re-paste the full 100-line virtual interest block, let me know, but it is safe!)
+    today = timezone.now().date()
+    
+    # 1. Grab all physical Income transactions - Updated field names
+    all_income = Transaction.objects.filter(user=request.user, transaction_type='INCOME')
+
+    stats = all_income.aggregate(
+        total_earned=Sum('total_amount'),
+        avg_deposit=Avg('total_amount'),
+        total_deposits=Count('id')
+    )
+    
+    base_total_earned = stats['total_earned'] or Decimal('0.00')
+
+    # 2. Calculate Virtual Interest (Phantom Yield)
+    total_phantom_interest = Decimal('0.00')
+    goals = SavingsGoal.objects.filter(user=request.user)
+
+    for goal in goals:
+        current_balance = Decimal('0.00')
+        daily_rate = (goal.interest_rate / Decimal('100')) / Decimal('365') if goal.interest_rate else Decimal('0.00')
+
+        # Updated to use your new relationship name
+        contributions = goal.transaction_contributions.order_by('date')
+        
+        if contributions.exists():
+            last_date = contributions.first().date
+            for contrib in contributions:
+                days_passed = (contrib.date - last_date).days
+                if days_passed > 0 and current_balance > 0:
+                    interest = current_balance * daily_rate * Decimal(days_passed)
+                    total_phantom_interest += interest
+                    current_balance += interest
+                
+                current_balance += contrib.total_amount
+                last_date = contrib.date
+
+            days_since_last = (today - last_date).days
+            if days_since_last > 0 and current_balance > 0:
+                interest = current_balance * daily_rate * Decimal(days_since_last)
+                total_phantom_interest += interest
+
+    total_phantom_interest = round(total_phantom_interest, 2)
+    grand_total_earned = base_total_earned + total_phantom_interest
+
+    # 3. Prepare Charts
+    # Updated to use total_amount from Transaction
+    income_by_category = Transaction.objects.filter(
+        user=request.user,
+        transaction_type='INCOME'
+    ).values('linked_budget__category').annotate(total=Sum('total_amount')).order_by('-total')
+
+    category_labels = []
+    category_data = []
+    for item in income_by_category:
+        name = item['linked_budget__category'] or "Uncategorized"
+        category_labels.append(name)
+        category_data.append(float(item['total']))
+
+    if total_phantom_interest > 0:
+        category_labels.append('Savings Yield (Virtual)')
+        category_data.append(float(total_phantom_interest))
+
+    context = {
+        'total_earned': grand_total_earned,
+        'avg_deposit': stats['avg_deposit'] or Decimal('0.00'),
+        'total_deposits': stats['total_deposits'] or 0,
+        'category_labels': json.dumps(category_labels),
+        'category_data': json.dumps(category_data),
+    }
+    return render(request, 'finances/income.html', context)
 
 # ==========================================
 # USER AUTHENTICATION & EXPORTS
