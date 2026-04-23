@@ -24,6 +24,19 @@ TransactionLineItemFormSet = inlineformset_factory(
     extra=3, 
     can_delete=True 
 )
+class TransactionLineItemForm(forms.ModelForm):
+    class Meta:
+        model = TransactionLineItem
+        # Make sure these two are included in your list!
+        fields = ['category', 'amount', 'linked_debt', 'linked_savings']
+        
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            # This ensures you only see YOUR loans and goals, not everyone's
+            self.fields['linked_debt'].queryset = Debt.objects.filter(user=user)
+            self.fields['linked_savings'].queryset = SavingsGoal.objects.filter(user=user)
 
 class BudgetForm(forms.ModelForm):
     class Meta:
