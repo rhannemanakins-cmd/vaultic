@@ -4,10 +4,17 @@
 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 35px;">
     <div>
         <h1 style="margin: 0; font-size: 32px; color: var(--text-main);">Dashboard</h1>
-        <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; color: var(--text-light); font-size: 14px;">
-            <span style="display: inline-block; width: 8px; height: 8px; background: var(--brand-primary); border-radius: 50%;"></span>
-            Period: <strong>{{ start_date|date:"M d" }} — {{ end_date|date:"M d, Y" }}</strong>
-        </div>
+<div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+    <a href="?month={{ prev_month.month }}&year={{ prev_month.year }}" 
+       style="text-decoration: none; font-size: 20px; color: var(--brand-primary); font-weight: bold;">&larr;</a>
+    
+    <div style="background: var(--bg-card); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 14px; font-weight: 600;">
+        {{ start_date|date:"F Y" }}
+    </div>
+
+    <a href="?month={{ next_month.month }}&year={{ next_month.year }}" 
+       style="text-decoration: none; font-size: 20px; color: var(--brand-primary); font-weight: bold;">&rarr;</a>
+</div>
     </div>
     
     <div style="display: flex; gap: 12px;">

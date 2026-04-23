@@ -23,29 +23,37 @@ from .forms import TransactionForm, BudgetForm, DebtForm, SavingsGoalForm, Exten
 # ==========================================
 @login_required
 def dashboard(request):
-    today = timezone.now().date()
-    # Logic for Date Range
-    start_date = today.replace(day=1)
-    last_day = calendar.monthrange(today.year, today.month)[1]
-    end_date = today.replace(day=last_day)
+    # 1. Capture requested month/year from URL, default to NOW
+    now = timezone.now().date()
+    month = int(request.GET.get('month', now.month))
+    year = int(request.GET.get('year', now.year))
 
-    # Calculate Total All-Time Balance
-    all_income = Transaction.objects.filter(user=request.user, transaction_type='INCOME').aggregate(total=Sum('total_amount'))['total'] or 0
-    all_expenses = Transaction.objects.filter(user=request.user, transaction_type='EXPENSE').aggregate(total=Sum('total_amount'))['total'] or 0
-    total_balance = all_income - all_expenses
+    # 2. Calculate the Fluid Date Range
+    start_date = datetime.date(year, month, 1)
+    last_day = calendar.monthrange(year, month)[1]
+    end_date = datetime.date(year, month, last_day)
 
-    # Monthly Cash Flow (Using start_date)
+    # 3. Handle Navigation Logic (Previous/Next Month)
+    prev_month = start_date - datetime.timedelta(days=1)
+    next_month = end_date + datetime.timedelta(days=1)
+
+    # 4. Filter Transactions ACCURATELY to this period
     monthly_income = Transaction.objects.filter(
         user=request.user, 
         transaction_type='INCOME', 
-        date__gte=start_date
+        date__range=[start_date, end_date] # Accuracy fix
     ).aggregate(total=Sum('total_amount'))['total'] or 0
 
     monthly_expenses = Transaction.objects.filter(
         user=request.user, 
         transaction_type='EXPENSE', 
-        date__gte=start_date
+        date__range=[start_date, end_date]
     ).aggregate(total=Sum('total_amount'))['total'] or 0
+
+    # Total Balance remains "All Time" for accounting accuracy
+    all_income = Transaction.objects.filter(user=request.user, transaction_type='INCOME').aggregate(total=Sum('total_amount'))['total'] or 0
+    all_expenses = Transaction.objects.filter(user=request.user, transaction_type='EXPENSE').aggregate(total=Sum('total_amount'))['total'] or 0
+    total_balance = all_income - all_expenses
 
     recent_transactions = Transaction.objects.filter(user=request.user).order_by('-date', '-id')[:5]
 
@@ -56,8 +64,58 @@ def dashboard(request):
         'recent_transactions': recent_transactions,
         'start_date': start_date,
         'end_date': end_date,
+        'prev_month': prev_month,
+        'next_month': next_month,
     }
     return render(request, 'finances/dashboard.html', context)
+
+@login_required
+def budget_dashboard(request):
+    # Same Fluid Logic for Budgets
+    now = timezone.now().date()
+    month = int(request.GET.get('month', now.month))
+    year = int(request.GET.get('year', now.year))
+    start_date = datetime.date(year, month, 1)
+    last_day = calendar.monthrange(year, month)[1]
+    end_date = datetime.date(year, month, last_day)
+
+    prev_month = start_date - datetime.timedelta(days=1)
+    next_month = end_date + datetime.timedelta(days=1)
+
+    budgets = Budget.objects.filter(user=request.user)
+    budget_data = []
+    
+    for budget in budgets:
+        # We only count transactions that fall within the SELECTED month
+        spent_agg = Transaction.objects.filter(
+            user=request.user,
+            date__range=[start_date, end_date],
+            linked_budget=budget,
+            transaction_type='EXPENSE'
+        ).aggregate(total=Sum('total_amount'))
+        
+        spent = spent_agg['total'] or Decimal('0.00')
+        remaining = budget.amount - spent
+        percent = min(int((float(spent) / float(budget.amount)) * 100), 100) if budget.amount > 0 else 0
+            
+        budget_data.append({
+            'id': budget.id,
+            'category': budget.category,
+            'limit': budget.amount,
+            'spent': spent,
+            'remaining': remaining,
+            'percent': percent,
+            'status_color': '#ef4444' if percent >= 90 else '#f59e0b' if percent >= 75 else '#10b981',
+            'start_date': budget.start_date,
+            'end_date': budget.end_date,
+        })
+        
+    return render(request, 'finances/budgets.html', {
+        'budget_data': budget_data,
+        'current_period': start_date,
+        'prev_month': prev_month,
+        'next_month': next_month,
+    })
 
 # ==========================================
 # TRANSACTION MANAGEMENT
