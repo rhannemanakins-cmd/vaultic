@@ -26,7 +26,7 @@ from .forms import TransactionForm, BudgetForm, DebtForm, SavingsGoalForm, Exten
 # ==========================================
 # MAIN DASHBOARD ENGINE
 # ==========================================
-@@login_required
+@login_required
 def dashboard(request):
     import calendar
     today = timezone.now().date()
