@@ -241,6 +241,7 @@ def debt_dashboard(request):
             percent_paid = 0
 
         debt_data.append({
+            'id': debt.id,
             'name': debt.name,
             'vendor': debt.vendor,
             'principal_balance': debt.principal_balance,
@@ -320,6 +321,7 @@ def savings_dashboard(request):
             percent_saved = 0
 
         savings_data.append({
+            'id': goal.id,
             'name': goal.name,
             'target_amount': goal.target_amount,
             'target_date': goal.target_date,
