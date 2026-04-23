@@ -10,7 +10,7 @@ from .models import Transaction, TransactionLineItem, Budget, Debt, SavingsGoal
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
-        # We include the linked fields here for the "Quick Add" logic
+        # These stay here! This is where your dropdowns live now.
         fields = ['date', 'vendor', 'total_amount', 'transaction_type', 'linked_debt', 'linked_savings', 'notes']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
@@ -18,11 +18,8 @@ class TransactionForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        # This catches the 'user' passed from views.py
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        
-        # This ensures you only see YOUR loans and goals in the dropdowns
         if user:
             self.fields['linked_debt'].queryset = Debt.objects.filter(user=user)
             self.fields['linked_savings'].queryset = SavingsGoal.objects.filter(user=user)
@@ -30,21 +27,15 @@ class TransactionForm(forms.ModelForm):
 class TransactionLineItemForm(forms.ModelForm):
     class Meta:
         model = TransactionLineItem
-        fields = ['category', 'amount', 'linked_debt', 'linked_savings']
-        
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
-        super().__init__(*args, **kwargs)
-        if user:
-            self.fields['linked_debt'].queryset = Debt.objects.filter(user=user)
-            self.fields['linked_savings'].queryset = SavingsGoal.objects.filter(user=user)
+        # REMOVED linked_debt and linked_savings from here to fix the crash
+        fields = ['category', 'amount']
 
-# This links Transaction to Line Items (useful for future multi-category splits)
+# This links Transaction to Line Items
 TransactionLineItemFormSet = inlineformset_factory(
     Transaction, 
     TransactionLineItem, 
-    fields=['category', 'amount', 'linked_debt', 'linked_savings'],
-    extra=3, 
+    fields=['category', 'amount'], # Fixed: No more "Unknown Field" error
+    extra=1, 
     can_delete=True 
 )
 
