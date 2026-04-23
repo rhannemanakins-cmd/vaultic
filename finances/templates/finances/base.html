@@ -11,26 +11,24 @@
 
     <style>
         /* ==========================================
-           1. THE DESIGN SYSTEM (Midnight & Sapphire)
+           1. THE DESIGN SYSTEM (Pure Midnight)
            ========================================== */
         :root {
-            /* Brand & Accents */
-            --brand-primary: #3B82F6;   /* Vibrant Sapphire Blue */
-            --brand-danger: #EF4444;    /* Bright red for delete */
-            --brand-success: #10B981;   /* Emerald green for success */
-            
-            /* Backgrounds */
-            --bg-main: #0F172A;         /* Deepest midnight for main background */
-            --bg-card: #1E293B;         /* Slate dark for cards & sidebar */
+            /* Pure Monochrome */
+            --brand-primary: #FAFAFA;   /* Crisp white for primary actions & logos */
+            --bg-main: #000000;         /* True pitch black */
+            --bg-card: #09090B;         /* Extremely dark slate/gray for cards */
             
             /* Typography */
-            --text-main: #F8FAFC;       /* Crisp white for readable text */
-            --text-light: #94A3B8;      /* Muted blue-gray for subtitles/labels */
+            --text-main: #FAFAFA;       /* White text */
+            --text-light: #A1A1AA;      /* Muted gray for subtitles */
             
             /* UI Elements */
-            --border-color: #334155;    /* Subtle dark border for tables/dividers */
-            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+            --border-color: #27272A;    /* Subtle dark border */
+            --brand-danger: #52525B;    /* Muted gray instead of bright red */
+            --brand-success: #3F3F46;   /* Muted gray instead of bright green */
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.8);
             --radius: 12px;
         }
 
@@ -77,7 +75,7 @@
         }
         
         nav a:hover { 
-            background: rgba(59, 130, 246, 0.1); /* Subtle blue tint */
+            background: rgba(255, 255, 255, 0.05); 
             color: var(--brand-primary); 
             transform: translateX(4px);
         }
@@ -102,7 +100,7 @@
         }
 
         /* ==========================================
-           5. FORMS & BUTTONS (Upgraded with Hover States)
+           5. FORMS & BUTTONS
            ========================================== */
         input, select {
             width: 100%;
@@ -120,7 +118,7 @@
         input:focus, select:focus {
             outline: none;
             border-color: var(--brand-primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); 
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1); 
         }
 
         /* Base Button Styles */
@@ -137,18 +135,18 @@
             text-align: center;
         }
 
-        /* The Blue Primary Button */
+        /* Pure White Primary Button (Dark Text) */
         .btn-primary { 
             background: var(--brand-primary); 
-            color: white; 
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+            color: #000000; 
+            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.05);
         }
         .btn-primary:hover { 
-            background: #2563EB; /* Slightly darker blue on hover */
+            background: #D4D4D8; /* Silver on hover */
             transform: translateY(-1px);
         }
 
-        /* The Outline Button (For CSV & Pagination) */
+        /* Outline Button */
         .btn-outline {
             background: var(--bg-card);
             color: var(--text-main);
@@ -163,6 +161,45 @@
         .auth-section { margin-top: auto; padding-top: 25px; border-top: 1px solid var(--border-color); }
         .btn-success { background: var(--brand-success); color: white; }
         .btn-danger { background: var(--brand-danger); color: white; }
-        .btn-success:hover { background: #059669; }
-        .btn-danger:hover { background: #DC2626; }
+        .btn-success:hover { background: #52525B; }
+        .btn-danger:hover { background: #71717A; }
         .auth-btn { width: 100%; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div>
+            <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-top: 0; margin-bottom: 30px; color: var(--text-main); padding-left: 10px;">
+                TillyBudget<span style="color: #A1A1AA;">.</span>
+            </h2>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'budgets' %}">Budgets</a>
+            <a href="{% url 'debts' %}">Debt Tracker</a>
+            <a href="{% url 'expenses' %}">Expenses</a>
+            <a href="{% url 'income' %}">Income</a>
+            <a href="{% url 'savings' %}">Savings Goals</a>
+            <a href="{% url 'transaction_list' %}">Transactions</a> 
+        </div>
+
+        <div class="auth-section">
+            {% if user.is_authenticated %}
+                <p style="color: var(--text-light); font-size: 13px; margin-bottom: 15px; padding-left: 10px;">
+                    Welcome back,<br><span style="color: var(--text-main); font-size: 16px; font-weight: 600;">{{ user.userprofile.preferred_name|default:user.username }}</span>
+                </p>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="auth-btn btn-danger btn">Secure Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="auth-btn btn-primary btn">Login</a>
+                <a href="{% url 'register' %}" class="auth-btn btn-success btn">Create Account</a>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>
