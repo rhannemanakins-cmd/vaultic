@@ -1,0 +1,22 @@
+{% extends 'finances/base.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 60px auto; text-align: center; border-top: 4px solid var(--brand-danger);">
+    <h2 style="color: var(--text-main); margin-bottom: 15px;">Delete Savings Goal?</h2>
+    
+    <p style="color: var(--text-main); font-size: 16px; margin-bottom: 10px;">
+        Are you sure you want to permanently delete the tracking goal for <strong>"{{ object.name }}"</strong>? 
+    </p>
+    <p style="color: var(--text-light); font-size: 14px; margin-bottom: 30px;">
+        This action cannot be undone. Your actual money is safe, but this goal will be wiped from your dashboard.
+    </p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: flex; justify-content: center; gap: 15px;">
+            <a href="{% url 'savings' %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-danger">Yes, Delete Goal</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

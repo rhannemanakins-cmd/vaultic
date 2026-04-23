@@ -81,6 +81,25 @@ class TransactionLineItem(models.Model):
     linked_debt = models.ForeignKey(Debt, on_delete=models.SET_NULL, null=True, blank=True, related_name='payments')
     linked_savings = models.ForeignKey(SavingsGoal, on_delete=models.SET_NULL, null=True, blank=True, related_name='contributions')
 
+    def save(self, *args, **kwargs):
+        # 1. Check if this is a brand new transaction being created
+        is_new = self.pk is None
+        
+        # 2. Save the line item to the database first
+        super().save(*args, **kwargs)
+        
+        # 3. If it is new, trigger the balance updates
+        if is_new:
+            if self.linked_debt:
+                # Subtract the payment from the debt principal
+                self.linked_debt.principal_balance -= self.amount
+                self.linked_debt.save()
+                
+            if self.linked_savings:
+                # Add the contribution to the savings balance
+                self.linked_savings.current_balance += self.amount
+                self.linked_savings.save()
+
     def __str__(self):
         return f"{self.category} - ${self.amount} (Split from {self.transaction.vendor})"
 # ==========================================

@@ -17,7 +17,9 @@ from .forms import TransactionForm, TransactionLineItemFormSet, BudgetForm, Debt
 import csv
 from django.http import HttpResponse
 from django.core.paginator import Paginator
-
+from django.urls import reverse_lazy
+from django.views.generic.edit import UpdateView, DeleteView
+from .models import Debt, SavingsGoal
 from django.db.models import Sum
 from django.utils import timezone
 import datetime
@@ -556,3 +558,30 @@ def export_transactions_csv(request):
         writer.writerow([txn.date, txn.vendor, txn.transaction_type, txn.total_amount])
 
     return response
+# ==========================================
+# DEBT MANAGEMENT VIEWS
+# ==========================================
+class DebtUpdateView(UpdateView):
+    model = Debt
+    fields = ['name', 'vendor', 'principal_balance', 'interest_rate', 'monthly_payment', 'due_date', 'expected_maturity_date']
+    template_name = 'finances/debt_form.html' # Reuses your existing creation form
+    success_url = reverse_lazy('debts') # Redirects back to the debt dashboard
+
+class DebtDeleteView(DeleteView):
+    model = Debt
+    template_name = 'finances/debt_confirm_delete.html'
+    success_url = reverse_lazy('debts')
+
+# ==========================================
+# SAVINGS MANAGEMENT VIEWS
+# ==========================================
+class SavingsUpdateView(UpdateView):
+    model = SavingsGoal
+    fields = ['name', 'target_amount', 'current_balance', 'interest_rate', 'target_date', 'monthly_contribution_requirement']
+    template_name = 'finances/savings_form.html' # Reuses your existing creation form
+    success_url = reverse_lazy('savings') # Redirects back to the savings dashboard
+
+class SavingsDeleteView(DeleteView):
+    model = SavingsGoal
+    template_name = 'finances/savings_confirm_delete.html'
+    success_url = reverse_lazy('savings')

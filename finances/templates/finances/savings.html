@@ -1,46 +1,55 @@
 {% extends 'finances/base.html' %}
 {% block content %}
 <div class="card" style="max-width: 800px; margin: 0 auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h1>Savings Goals</h1>
-        <a href="{% url 'add_savings_goal' %}" style="padding: 10px 15px; background: #8e44ad; color: white; border-radius: 4px; text-decoration: none; font-size: 14px;">+ Add Goal</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h1 style="margin: 0;">Savings Goals</h1>
+        <a href="{% url 'add_savings_goal' %}" class="btn btn-primary">+ Add Goal</a>
     </div>
-    <p style="color: #7f8c8d; margin-bottom: 30px;">Track your sinking funds with real-time daily compound interest.</p>
+    <p style="color: var(--text-light); margin-bottom: 30px;">Track your sinking funds with real-time daily compound interest.</p>
     
     <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
         {% for s in savings_data %}
-        <div style="background: #fcfaff; border: 1px solid #f4effa; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+            
             <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                <strong style="font-size: 20px; color: #2c3e50;">{{ s.name }}</strong>
-                <span style="font-size: 20px; font-weight: bold; color: #8e44ad;">${{ s.current_balance|floatformat:2 }} Saved</span>
+                <strong style="font-size: 20px; color: var(--text-main);">{{ s.name }}</strong>
+                <span style="font-size: 20px; font-weight: bold; color: var(--brand-success);">${{ s.current_balance|floatformat:2 }} Saved</span>
             </div>
             
-            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; color: #7f8c8d;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px; color: var(--text-light);">
                 <span>Target: ${{ s.target_amount|floatformat:2 }}</span>
                 {% if s.interest_rate > 0 %}
                     <span>APY: {{ s.interest_rate }}%</span>
                 {% endif %}
             </div>
 
-            <div style="display: flex; justify-content: flex-start; margin-bottom: 15px; font-size: 13px; color: #27ae60; font-weight: bold;">
+            <div style="display: flex; justify-content: flex-start; margin-bottom: 15px; font-size: 13px; color: var(--brand-success); font-weight: bold;">
                 {% if s.total_interest > 0 %}
                     <span>+ ${{ s.total_interest|floatformat:2 }} Free Interest Earned!</span>
                 {% else %}
-                    <span style="color: #7f8c8d; font-weight: normal;">(Deposited: ${{ s.total_contributed|floatformat:2 }})</span>
+                    <span style="color: var(--text-light); font-weight: normal;">(Deposited: ${{ s.total_contributed|floatformat:2 }})</span>
                 {% endif %}
             </div>
 
-            <div style="width: 100%; background-color: #ecf0f1; border-radius: 10px; height: 16px; overflow: hidden; margin-bottom: 8px;">
-                <div style="width: {{ s.percent_saved }}%; background-color: #8e44ad; height: 100%; transition: width 0.5s ease-in-out;"></div>
+            <div style="width: 100%; background-color: var(--border-color); border-radius: 10px; height: 16px; overflow: hidden; margin-bottom: 15px;">
+                <div style="width: {{ s.percent_saved }}%; background-color: var(--brand-success); height: 100%; transition: width 0.5s ease-in-out;"></div>
             </div>
             
-            <div style="font-size: 14px; text-align: right; color: #8e44ad; font-weight: bold;">
-                {{ s.percent_saved }}% Reached (${{ s.remaining|floatformat:2 }} to go)
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 10px;">
+                    <a href="{% url 'edit_saving' s.id %}" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;">Edit</a>
+                    <a href="{% url 'delete_saving' s.id %}" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;">Delete</a>
+                </div>
+
+                <div style="font-size: 14px; text-align: right; color: var(--brand-success); font-weight: bold;">
+                    {{ s.percent_saved }}% Reached (${{ s.remaining|floatformat:2 }} to go)
+                </div>
             </div>
+
         </div>
         {% empty %}
-        <div style="text-align: center; padding: 40px; background: #f9f9f9; border-radius: 8px;">
-            <p style="color: #7f8c8d; margin-bottom: 15px;">You don't have any active savings goals.</p>
+        <div style="text-align: center; padding: 40px; background: var(--bg-card); border-radius: 8px; border: 1px dashed var(--border-color);">
+            <p style="color: var(--text-light); margin-bottom: 15px;">You don't have any active savings goals.</p>
             <p>Click "+ Add Goal" to set up your first high-yield tracker.</p>
         </div>
         {% endfor %}

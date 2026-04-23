@@ -18,4 +18,11 @@ urlpatterns = [
     path('transaction/<int:pk>/edit/', views.update_transaction, name='update_transaction'),
     path('transaction/<int:pk>/delete/', views.delete_transaction, name='delete_transaction'),
     path('export/csv/', views.export_transactions_csv, name='export_transactions_csv'),
+    # Debt Edit/Delete
+    path('debts/<int:pk>/edit/', views.DebtUpdateView.as_view(), name='edit_debt'),
+    path('debts/<int:pk>/delete/', views.DebtDeleteView.as_view(), name='delete_debt'),
+    
+    # Savings Edit/Delete
+    path('savings/<int:pk>/edit/', views.SavingsUpdateView.as_view(), name='edit_saving'),
+    path('savings/<int:pk>/delete/', views.SavingsDeleteView.as_view(), name='delete_saving'),
 ]
