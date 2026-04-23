@@ -102,7 +102,7 @@
         }
 
         /* ==========================================
-           5. FORMS & BUTTONS
+           5. FORMS & BUTTONS (Upgraded with Hover States)
            ========================================== */
         input, select {
             width: 100%;
@@ -112,8 +112,8 @@
             font-family: 'Inter', sans-serif;
             margin-top: 4px;
             margin-bottom: 16px;
-            background: var(--bg-main); /* Dark background for inputs */
-            color: var(--text-main);    /* White text when typing */
+            background: var(--bg-main); 
+            color: var(--text-main);    
             transition: border-color 0.2s, box-shadow 0.2s;
         }
 
@@ -123,68 +123,46 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); 
         }
 
-        .btn-primary { background: var(--brand-primary); color: white; }
+        /* Base Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+        }
+
+        /* The Blue Primary Button */
+        .btn-primary { 
+            background: var(--brand-primary); 
+            color: white; 
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+        }
+        .btn-primary:hover { 
+            background: #2563EB; /* Slightly darker blue on hover */
+            transform: translateY(-1px);
+        }
+
+        /* The Outline Button (For CSV & Pagination) */
+        .btn-outline {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+        .btn-outline:hover {
+            background: var(--border-color);
+            color: white;
+        }
+
+        /* Sidebar Auth Buttons */
+        .auth-section { margin-top: auto; padding-top: 25px; border-top: 1px solid var(--border-color); }
         .btn-success { background: var(--brand-success); color: white; }
         .btn-danger { background: var(--brand-danger); color: white; }
-        
-        .auth-section { 
-            margin-top: auto; 
-            padding-top: 25px; 
-            border-top: 1px solid var(--border-color); 
-        }
-        
-        .auth-btn { 
-            display: block; 
-            width: 100%; 
-            padding: 12px; 
-            text-align: center; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            font-weight: 600; 
-            margin-bottom: 10px; 
-            transition: opacity 0.2s; 
-            border: none; 
-            cursor: pointer; 
-            font-size: 14px;
-        }
-        
-        .auth-btn:hover { opacity: 0.9; }
-    </style>
-</head>
-<body>
-    <nav>
-        <div>
-            <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-top: 0; margin-bottom: 30px; color: var(--text-main); padding-left: 10px;">
-                <span style="color: var(--brand-primary);">T</span>illyBudget<span style="color: var(--brand-primary);">.</span>
-            </h2>
-            <a href="{% url 'dashboard' %}">Dashboard</a>
-            <a href="{% url 'budgets' %}">Budgets</a>
-            <a href="{% url 'debts' %}">Debt Tracker</a>
-            <a href="{% url 'expenses' %}">Expenses</a>
-            <a href="{% url 'income' %}">Income</a>
-            <a href="{% url 'savings' %}">Savings Goals</a>
-            <a href="{% url 'transaction_list' %}">Transactions</a> 
-        </div>
-
-        <div class="auth-section">
-            {% if user.is_authenticated %}
-                <p style="color: var(--text-light); font-size: 13px; margin-bottom: 15px; padding-left: 10px;">
-                    Welcome back,<br><span style="color: var(--text-main); font-size: 16px; font-weight: 600;">{{ user.userprofile.preferred_name|default:user.username }}</span>
-                </p>
-                <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="auth-btn btn-danger">Secure Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'login' %}" class="auth-btn btn-primary">Login</a>
-                <a href="{% url 'register' %}" class="auth-btn btn-success">Create Account</a>
-            {% endif %}
-        </div>
-    </nav>
-    
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
-</body>
-</html>
+        .btn-success:hover { background: #059669; }
+        .btn-danger:hover { background: #DC2626; }
+        .auth-btn { width: 100%; margin-bottom: 10px; }
