@@ -14,9 +14,13 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-fallback-key')
 # On Render, set DEBUG to False in Environment Variables
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-# Dynamically handle hosts for local and production
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+# 1. Update your Allowed Hosts
+ALLOWED_HOSTS = ['tillybudget.onrender.com', 'localhost', '127.0.0.1']
 
+# 2. Update your CSRF Trusted Origins (crucial for logins)
+CSRF_TRUSTED_ORIGINS = [
+    'https://tillybudget.onrender.com',
+]
 # 3. Application Definition
 INSTALLED_APPS = [
     'django.contrib.admin',
