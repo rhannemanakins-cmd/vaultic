@@ -106,41 +106,6 @@ def delete_transaction(request, pk):
 # ==========================================
 # BUDGETS
 # ==========================================
-@login_required
-def budget_dashboard(request):
-    today = timezone.now().date()
-    start_of_month = today.replace(day=1)
-    budgets = Budget.objects.filter(user=request.user)
-    budget_data = []
-    
-    for budget in budgets:
-        spent_agg = TransactionLineItem.objects.filter(
-            transaction__user=request.user,
-            transaction__date__gte=start_of_month,
-            category=budget.category
-        ).aggregate(Sum('amount'))
-        
-        spent = spent_agg['amount__sum'] or Decimal('0.00')
-        remaining = budget.amount - spent
-        percent = min(int((spent / budget.amount) * 100), 100) if budget.amount > 0 else 0
-            
-        if percent >= 90:
-            status_color = '#e74c3c' 
-        elif percent >= 75:
-            status_color = '#f1c40f' 
-        else:
-            status_color = '#2ecc71' 
-
-        budget_data.append({
-            'category': budget.category,
-            'limit': budget.amount,
-            'spent': spent,
-            'remaining': remaining,
-            'percent': percent,
-            'status_color': status_color,
-            'over_budget': abs(remaining) if remaining < 0 else 0
-        })
-    return render(request, 'finances/budgets.html', {'budget_data': budget_data})
 
 @login_required
 def add_budget(request):
