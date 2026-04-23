@@ -97,13 +97,6 @@ class TransactionLineItem(models.Model):
     def __str__(self):
         return f"{self.category} - ${self.amount}"
 
-class TransactionLineItem(models.Model):
-    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='line_items')
-    category = models.CharField(max_length=100)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    linked_debt = models.ForeignKey(Debt, on_delete=models.SET_NULL, null=True, blank=True, related_name='payments')
-    linked_savings = models.ForeignKey(SavingsGoal, on_delete=models.SET_NULL, null=True, blank=True, related_name='contributions')
-
     def save(self, *args, **kwargs):
         # 1. Check if this is a brand new transaction being created
         is_new = self.pk is None
