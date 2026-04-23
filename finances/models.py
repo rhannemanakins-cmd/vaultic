@@ -2,9 +2,22 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import date
-from django.core.validators import MinValueValidator, MaxValueValidator # Added for safety
-from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
+# ==========================================
+# 1. USER PROFILES
+# ==========================================
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    preferred_name = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.preferred_name}'s Profile"
+
+# ==========================================
+# 2. SAVINGS GOALS
+# ==========================================
 class SavingsGoal(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='savings_goals')
     name = models.CharField(max_length=100)
@@ -23,6 +36,9 @@ class SavingsGoal(models.Model):
     def __str__(self):
         return f"{self.name} - {self.percent_reached}%"
 
+# ==========================================
+# 3. DEBTS (LOANS)
+# ==========================================
 class Debt(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='debts')
     name = models.CharField(max_length=100)
@@ -30,7 +46,6 @@ class Debt(models.Model):
     principal_balance = models.DecimalField(max_digits=12, decimal_places=2)
     interest_rate = models.DecimalField(max_digits=5, decimal_places=2, help_text="Annual Interest Rate (%)")
     monthly_payment = models.DecimalField(max_digits=10, decimal_places=2)
-    # Added validators to ensure dates are strictly 1-31
     due_date = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(31)], 
         help_text="Day of the month the payment is due (1-31)"
@@ -41,6 +56,9 @@ class Debt(models.Model):
     def __str__(self):
         return f"{self.name} ({self.vendor}) - ${self.principal_balance}"
 
+# ==========================================
+# 4. BUDGET CATEGORIES
+# ==========================================
 class Budget(models.Model):
     BUDGET_TYPES = [
         ('INCOME', 'Income'),
@@ -57,6 +75,9 @@ class Budget(models.Model):
     def __str__(self):
         return f"{self.category} Budget: ${self.amount}"
 
+# ==========================================
+# 5. THE MASTER TRANSACTION MODEL
+# ==========================================
 class Transaction(models.Model):
     TRANSACTION_TYPES = [
         ('INCOME', 'Income'),
@@ -70,7 +91,8 @@ class Transaction(models.Model):
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
     notes = models.TextField(null=True, blank=True)
     
-    # MOVED THESE HERE for easier "Quick Add"
+    # RELATIONAL LINKS
+    linked_budget = models.ForeignKey(Budget, on_delete=models.SET_NULL, null=True, blank=True, related_name='budget_transactions')
     linked_debt = models.ForeignKey(Debt, on_delete=models.SET_NULL, null=True, blank=True, related_name='transaction_payments')
     linked_savings = models.ForeignKey(SavingsGoal, on_delete=models.SET_NULL, null=True, blank=True, related_name='transaction_contributions')
 
@@ -78,6 +100,7 @@ class Transaction(models.Model):
         is_new = self.pk is None
         super().save(*args, **kwargs)
         
+        # AUTOMATION: Update balances on save
         if is_new:
             if self.linked_debt:
                 self.linked_debt.principal_balance -= self.total_amount
@@ -89,43 +112,13 @@ class Transaction(models.Model):
     def __str__(self):
         return f"{self.date} - {self.vendor} (${self.total_amount})"
 
+# ==========================================
+# 6. TRANSACTION LINE ITEMS (Optional Splits)
+# ==========================================
 class TransactionLineItem(models.Model):
     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='line_items')
     category = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    # We can keep these here for "Splits" later, or remove them if you just want simple adding
+
     def __str__(self):
         return f"{self.category} - ${self.amount}"
-
-    def save(self, *args, **kwargs):
-        # 1. Check if this is a brand new transaction being created
-        is_new = self.pk is None
-        
-        # 2. Save the line item to the database first
-        super().save(*args, **kwargs)
-        
-        # 3. If it is new, trigger the balance updates
-        if is_new:
-            if self.linked_debt:
-                # Subtract the payment from the debt principal
-                self.linked_debt.principal_balance -= self.amount
-                self.linked_debt.save()
-                
-            if self.linked_savings:
-                # Add the contribution to the savings balance
-                self.linked_savings.current_balance += self.amount
-                self.linked_savings.save()
-
-    def __str__(self):
-        return f"{self.category} - ${self.amount} (Split from {self.transaction.vendor})"
-# ==========================================
-# USER PROFILES (EXTENDED DATA)
-# ==========================================
-class UserProfile(models.Model):
-    # The OneToOneField links this exactly to one Django User
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    preferred_name = models.CharField(max_length=50)
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.preferred_name}'s Profile"

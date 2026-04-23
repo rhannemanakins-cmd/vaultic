@@ -10,8 +10,8 @@ from .models import Transaction, TransactionLineItem, Budget, Debt, SavingsGoal
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
-        # These stay here! This is where your dropdowns live now.
-        fields = ['date', 'vendor', 'total_amount', 'transaction_type', 'linked_debt', 'linked_savings', 'notes']
+        # Add 'linked_budget' to the fields list
+        fields = ['date', 'vendor', 'total_amount', 'transaction_type', 'linked_budget', 'linked_debt', 'linked_savings', 'notes']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
             'notes': forms.Textarea(attrs={'rows': 3}),
@@ -21,6 +21,8 @@ class TransactionForm(forms.ModelForm):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         if user:
+            # Add this line to filter the budget dropdown
+            self.fields['linked_budget'].queryset = Budget.objects.filter(user=user)
             self.fields['linked_debt'].queryset = Debt.objects.filter(user=user)
             self.fields['linked_savings'].queryset = SavingsGoal.objects.filter(user=user)
 

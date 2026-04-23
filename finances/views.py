@@ -378,3 +378,36 @@ def export_transactions_csv(request):
     for txn in transactions:
         writer.writerow([txn.date, txn.vendor, txn.transaction_type, txn.total_amount])
     return response
+@login_required
+def budget_dashboard(request):
+    today = timezone.now().date()
+    start_of_month = today.replace(day=1)
+    
+    budgets = Budget.objects.filter(user=request.user)
+    budget_data = []
+    
+    for budget in budgets:
+        # NEW LOGIC: Filter Transactions by the linked_budget field
+        spent_agg = Transaction.objects.filter(
+            user=request.user,
+            date__gte=start_of_month,
+            linked_budget=budget # Direct relational link
+        ).aggregate(Sum('total_amount'))
+        
+        spent = spent_agg['total_amount__sum'] or Decimal('0.00')
+        remaining = budget.amount - spent
+        
+        # ... (keep the rest of your percent and status_color logic) ...
+        
+        budget_data.append({
+            'id': budget.id, # Good to have this for Edit/Delete buttons
+            'category': budget.category,
+            'limit': budget.amount,
+            'spent': spent,
+            'remaining': remaining,
+            'percent': percent,
+            'status_color': status_color,
+            'over_budget': abs(remaining) if remaining < 0 else 0
+        })
+        
+    return render(request, 'finances/budgets.html', {'budget_data': budget_data})
