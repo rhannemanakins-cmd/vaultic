@@ -1,31 +1,19 @@
 {% extends 'finances/base.html' %}
-
 {% block content %}
-<div style="max-width: 500px; margin: 0 auto; padding-top: 20px;">
-    
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h1 style="margin: 0; font-size: 24px;">
-            {% if is_edit %}Edit Transaction{% else %}Log Transaction{% endif %}
-        </h1>
-        <a href="javascript:history.back()" style="color: var(--text-light); text-decoration: none; font-weight: 500; font-size: 14px;">&larr; Back</a>
-    </div>
-    <div class="card">
-        <form method="post">
-            {% csrf_token %}
-            
-            <div style="color: var(--text-main); font-weight: 500; font-size: 14px;">
-                {{ form.as_p }}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2>Add Transaction</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 5px;">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="color: var(--text-light);">{{ field.help_text }}</small>
+                {% endif %}
             </div>
-            
-            <div style="margin-top: 30px; display: flex; gap: 10px;">
-                <button type="submit" style="flex: 1; padding: 12px; background: var(--brand-primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
-                    Save Transaction
-                </button>
-                <a href="javascript:history.back()" style="padding: 12px 20px; background: #f1f5f9; color: var(--text-main); text-decoration: none; border-radius: 8px; font-weight: 600; text-align: center; transition: background 0.2s;">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Transaction</button>
+    </form>
 </div>
 {% endblock %}

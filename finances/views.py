@@ -587,3 +587,19 @@ class SavingsDeleteView(DeleteView):
     model = SavingsGoal
     template_name = 'finances/savings_confirm_delete.html'
     success_url = reverse_lazy('savings')
+from .forms import TransactionForm
+
+class TransactionCreateView(CreateView):
+    model = Transaction
+    form_class = TransactionForm
+    template_name = 'finances/transaction_form.html'
+    success_url = reverse_lazy('transaction_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user # This passes the user to the form
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)

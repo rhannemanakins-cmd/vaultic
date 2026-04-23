@@ -3,10 +3,26 @@ from django.forms import inlineformset_factory
 from .models import Transaction, TransactionLineItem, Budget, Debt, SavingsGoal
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django import forms
+from .models import Transaction, Debt, SavingsGoal
 
 # ALL MODELS IMPORTED HERE
 from .models import Transaction, TransactionLineItem, Budget, Debt
+class TransactionForm(forms.ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ['date', 'vendor', 'total_amount', 'transaction_type', 'linked_debt', 'linked_savings', 'notes']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+        }
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            # Only show the user's OWN loans and goals
+            self.fields['linked_debt'].queryset = Debt.objects.filter(user=user)
+            self.fields['linked_savings'].queryset = SavingsGoal.objects.filter(user=user)
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction

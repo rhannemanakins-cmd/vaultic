@@ -64,15 +64,38 @@ class Transaction(models.Model):
         ('TRANSFER', 'Transfer'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='transactions')
-    # Changed to date.today for DateField compatibility
     date = models.DateField(default=date.today) 
     vendor = models.CharField(max_length=100)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
     notes = models.TextField(null=True, blank=True)
+    
+    # MOVED THESE HERE for easier "Quick Add"
+    linked_debt = models.ForeignKey(Debt, on_delete=models.SET_NULL, null=True, blank=True, related_name='transaction_payments')
+    linked_savings = models.ForeignKey(SavingsGoal, on_delete=models.SET_NULL, null=True, blank=True, related_name='transaction_contributions')
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        
+        if is_new:
+            if self.linked_debt:
+                self.linked_debt.principal_balance -= self.total_amount
+                self.linked_debt.save()
+            if self.linked_savings:
+                self.linked_savings.current_balance += self.total_amount
+                self.linked_savings.save()
 
     def __str__(self):
         return f"{self.date} - {self.vendor} (${self.total_amount})"
+
+class TransactionLineItem(models.Model):
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='line_items')
+    category = models.CharField(max_length=100)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    # We can keep these here for "Splits" later, or remove them if you just want simple adding
+    def __str__(self):
+        return f"{self.category} - ${self.amount}"
 
 class TransactionLineItem(models.Model):
     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='line_items')
