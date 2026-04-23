@@ -11,28 +11,30 @@
 
     <style>
         /* ==========================================
-           1. THE DESIGN SYSTEM (Midnight & Sapphire)
+           1. THE DESIGN SYSTEM (The OG Vaultic Theme)
            ========================================== */
-:root {
-    /* Brand Accent */
-    --brand-primary: #3B82F6;   /* The vibrant sapphire blue (Dashboard icon, 2.5% text) */
-    
-    /* Backgrounds */
-    --bg-main: #0F172A;         /* The deepest midnight (Main content area background) */
-    --bg-card: #1E293B;         /* The lighter slate (Sidebar and the "Total Balance" card) */
-    
-    /* Typography */
-    --text-main: #F8FAFC;       /* Pure, crisp white for headers and amounts */
-    --text-light: #94A3B8;      /* Muted gray-blue for subtitles and table headers */
-    
-    /* Accents & UI */
-    --border-color: #334155;    /* Subtle line below "Recent Transactions" headers */
-    --brand-danger: #EF4444;    
-    --brand-success: #10B981;   
-    --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-    --radius: 12px;
-}
+        :root {
+            /* Brand */
+            --brand-primary: #3b82f6;   /* Classic Vaultic Blue */
+            
+            /* Backgrounds */
+            --bg-sidebar: #1e293b;      /* Original Dark Slate Sidebar */
+            --bg-main: #f8fafc;         /* Clean off-white main background */
+            --bg-card: #ffffff;         /* Pure white cards */
+            
+            /* Typography */
+            --text-sidebar: #ffffff;    /* White text for sidebar */
+            --text-main: #0f172a;       /* Dark text for readability */
+            --text-light: #64748b;      /* Standard gray for subtitles */
+            
+            /* Accents */
+            --border-color: #e2e8f0;    /* Original light gray borders */
+            --brand-danger: #ef4444;    
+            --brand-success: #10b981;   
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --radius: 8px;
+        }
 
         /* ==========================================
            2. GLOBAL RESETS
@@ -55,37 +57,31 @@
            ========================================== */
         nav { 
             width: 260px; 
-            background: var(--bg-card); 
-            color: var(--text-main); 
+            background: var(--bg-sidebar); 
+            color: var(--text-sidebar); 
             padding: 30px 20px; 
             display: flex; 
             flex-direction: column; 
-            box-shadow: var(--shadow-md);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             z-index: 10;
-            border-right: 1px solid var(--border-color);
         }
         
         nav a { 
-            color: var(--text-light); 
+            color: #cbd5e1; /* Slightly muted white for links */
             display: block; 
             padding: 12px 15px; 
             text-decoration: none; 
-            border-radius: 8px;
+            border-radius: var(--radius);
             font-weight: 500;
             transition: all 0.2s ease;
             margin-bottom: 4px;
         }
         
         nav a:hover { 
-            background: rgba(59, 130, 246, 0.1); /* Subtle blue tint */
-            color: var(--brand-primary); 
+            background: rgba(255, 255, 255, 0.1); 
+            color: var(--text-sidebar); 
             transform: translateX(4px);
         }
-        .nav-link-active {
-    background: rgba(59, 130, 246, 0.15); /* 15% opacity of the Sapphire Blue */
-    color: var(--brand-primary);
-    border-left: 3px solid var(--brand-primary); /* Optional: adds a nice left edge */
-}
 
         /* ==========================================
            4. MAIN CONTENT & CARDS
@@ -106,8 +102,12 @@
             transition: transform 0.2s ease;
         }
 
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
         /* ==========================================
-           5. FORMS & BUTTONS (Fixed with Hover States)
+           5. FORMS & BUTTONS
            ========================================== */
         input, select {
             width: 100%;
@@ -117,7 +117,7 @@
             font-family: 'Inter', sans-serif;
             margin-top: 4px;
             margin-bottom: 16px;
-            background: var(--bg-main); 
+            background: var(--bg-card); 
             color: var(--text-main);    
             transition: border-color 0.2s, box-shadow 0.2s;
         }
@@ -129,11 +129,10 @@
         }
 
         /* Base Button Styles */
-    /* Base Button Styles */
         .btn {
             display: inline-block;
             padding: 10px 18px;
-            border-radius: 8px;
+            border-radius: 6px;
             text-decoration: none;
             font-weight: 600;
             font-size: 14px;
@@ -143,31 +142,29 @@
             text-align: center;
         }
 
-        /* The Sapphire Primary Button (+ Quick Add) */
+        /* The Original Primary Button */
         .btn-primary { 
             background: var(--brand-primary); 
-            color: #FFFFFF; 
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+            color: white; 
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
         }
         .btn-primary:hover { 
-            background: #2563EB; /* Slightly darker sapphire */
+            background: #2563EB; 
             transform: translateY(-1px);
         }
 
-        /* The Ghost Outline Button (Download CSV & Pagination) */
+        /* The Original Outline Button */
         .btn-outline {
-            background: transparent;
-            color: var(--text-light); /* Muted text so it doesn't distract */
-            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid #cbd5e1;
         }
         .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.05); /* Very subtle light wash */
-            color: var(--text-main); /* Text lights up white on hover */
-            border-color: #475569; /* Border gets slightly brighter */
+            background: #f1f5f9;
         }
-        
+
         /* Sidebar Auth Buttons */
-        .auth-section { margin-top: auto; padding-top: 25px; border-top: 1px solid var(--border-color); }
+        .auth-section { margin-top: auto; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); }
         .btn-success { background: var(--brand-success); color: white; }
         .btn-danger { background: var(--brand-danger); color: white; }
         .btn-success:hover { background: #059669; }
@@ -178,10 +175,10 @@
 <body>
     <nav>
         <div>
-            <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-top: 0; margin-bottom: 30px; color: var(--text-main); padding-left: 10px;">
+            <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-top: 0; margin-bottom: 30px; color: var(--text-sidebar); padding-left: 10px;">
                 <span style="color: var(--brand-primary);">T</span>illyBudget<span style="color: var(--brand-primary);">.</span>
             </h2>
-            <a href="{% url 'dashboard' %}" class="nav-link-active">Dashboard</a>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
             <a href="{% url 'budgets' %}">Budgets</a>
             <a href="{% url 'debts' %}">Debt Tracker</a>
             <a href="{% url 'expenses' %}">Expenses</a>
@@ -192,8 +189,8 @@
 
         <div class="auth-section">
             {% if user.is_authenticated %}
-                <p style="color: var(--text-light); font-size: 13px; margin-bottom: 15px; padding-left: 10px;">
-                    Welcome back,<br><span style="color: var(--text-main); font-size: 16px; font-weight: 600;">{{ user.userprofile.preferred_name|default:user.username }}</span>
+                <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 15px; padding-left: 10px;">
+                    Welcome back,<br><span style="color: var(--text-sidebar); font-size: 16px; font-weight: 600;">{{ user.userprofile.preferred_name|default:user.username }}</span>
                 </p>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
