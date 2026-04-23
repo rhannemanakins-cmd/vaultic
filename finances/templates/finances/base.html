@@ -11,24 +11,26 @@
 
     <style>
         /* ==========================================
-           1. THE DESIGN SYSTEM (Pure Midnight)
+           1. THE DESIGN SYSTEM (Midnight & Sapphire)
            ========================================== */
         :root {
-            /* Pure Monochrome */
-            --brand-primary: #FAFAFA;   /* Crisp white for primary actions & logos */
-            --bg-main: #000000;         /* True pitch black */
-            --bg-card: #09090B;         /* Extremely dark slate/gray for cards */
+            /* Brand & Accents */
+            --brand-primary: #3B82F6;   /* Vibrant Sapphire Blue */
+            --brand-danger: #EF4444;    /* Bright red for delete */
+            --brand-success: #10B981;   /* Emerald green for success */
+            
+            /* Backgrounds */
+            --bg-main: #0F172A;         /* Deepest midnight for main background */
+            --bg-card: #1E293B;         /* Slate dark for cards & sidebar */
             
             /* Typography */
-            --text-main: #FAFAFA;       /* White text */
-            --text-light: #A1A1AA;      /* Muted gray for subtitles */
+            --text-main: #F8FAFC;       /* Crisp white for readable text */
+            --text-light: #94A3B8;      /* Muted blue-gray for subtitles/labels */
             
             /* UI Elements */
-            --border-color: #27272A;    /* Subtle dark border */
-            --brand-danger: #52525B;    /* Muted gray instead of bright red */
-            --brand-success: #3F3F46;   /* Muted gray instead of bright green */
-            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.5);
-            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.8);
+            --border-color: #334155;    /* Subtle dark border for tables/dividers */
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
             --radius: 12px;
         }
 
@@ -75,7 +77,7 @@
         }
         
         nav a:hover { 
-            background: rgba(255, 255, 255, 0.05); 
+            background: rgba(59, 130, 246, 0.1); /* Subtle blue tint */
             color: var(--brand-primary); 
             transform: translateX(4px);
         }
@@ -100,7 +102,7 @@
         }
 
         /* ==========================================
-           5. FORMS & BUTTONS
+           5. FORMS & BUTTONS (Fixed with Hover States)
            ========================================== */
         input, select {
             width: 100%;
@@ -118,7 +120,7 @@
         input:focus, select:focus {
             outline: none;
             border-color: var(--brand-primary);
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1); 
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); 
         }
 
         /* Base Button Styles */
@@ -135,18 +137,18 @@
             text-align: center;
         }
 
-        /* Pure White Primary Button (Dark Text) */
+        /* The Sapphire Primary Button */
         .btn-primary { 
             background: var(--brand-primary); 
-            color: #000000; 
-            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.05);
+            color: white; 
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
         }
         .btn-primary:hover { 
-            background: #D4D4D8; /* Silver on hover */
+            background: #2563EB; /* Darker sapphire on hover */
             transform: translateY(-1px);
         }
 
-        /* Outline Button */
+        /* The Outline Button (For CSV & Pagination) */
         .btn-outline {
             background: var(--bg-card);
             color: var(--text-main);
@@ -161,8 +163,8 @@
         .auth-section { margin-top: auto; padding-top: 25px; border-top: 1px solid var(--border-color); }
         .btn-success { background: var(--brand-success); color: white; }
         .btn-danger { background: var(--brand-danger); color: white; }
-        .btn-success:hover { background: #52525B; }
-        .btn-danger:hover { background: #71717A; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger:hover { background: #DC2626; }
         .auth-btn { width: 100%; margin-bottom: 10px; }
     </style>
 </head>
@@ -170,7 +172,7 @@
     <nav>
         <div>
             <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-top: 0; margin-bottom: 30px; color: var(--text-main); padding-left: 10px;">
-                TillyBudget<span style="color: #A1A1AA;">.</span>
+                <span style="color: var(--brand-primary);">T</span>illyBudget<span style="color: var(--brand-primary);">.</span>
             </h2>
             <a href="{% url 'dashboard' %}">Dashboard</a>
             <a href="{% url 'budgets' %}">Budgets</a>
