@@ -18,6 +18,9 @@ urlpatterns = [
     path('transaction/<int:pk>/edit/', views.update_transaction, name='update_transaction'),
     path('transaction/<int:pk>/delete/', views.delete_transaction, name='delete_transaction'),
     path('export/csv/', views.export_transactions_csv, name='export_transactions_csv'),
+    # Budget Management
+    path('budgets/<int:pk>/edit/', views.BudgetUpdateView.as_view(), name='edit_budget'),
+    path('budgets/<int:pk>/delete/', views.BudgetDeleteView.as_view(), name='delete_budget'),
     # Debt Edit/Delete
     path('debts/<int:pk>/edit/', views.DebtUpdateView.as_view(), name='edit_debt'),
     path('debts/<int:pk>/delete/', views.DebtDeleteView.as_view(), name='delete_debt'),

@@ -2,36 +2,52 @@
 
 {% block content %}
 <div class="card" style="max-width: 800px; margin: 0 auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h1>Monthly Budgets</h1>
-        <a href="{% url 'add_budget' %}" style="padding: 10px 15px; background: #3498db; color: white; border-radius: 4px; text-decoration: none; font-size: 14px;">+ Add Budget Limit</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h1 style="margin: 0;">Monthly Budgets</h1>
+        <a href="{% url 'add_budget' %}" class="btn btn-primary">+ Add Budget Limit</a>
     </div>
-    <p style="color: #7f8c8d; margin-bottom: 30px;">Track your spending against your limits for the current month.</p>
+    <p style="color: var(--text-light); margin-bottom: 30px;">Track your spending against your limits for the current month.</p>
     
     <div style="display: flex; flex-direction: column; gap: 20px;">
         {% for b in budget_data %}
-        <div style="background: #fdfdfd; border: 1px solid #eee; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <strong style="font-size: 18px; color: #2c3e50;">{{ b.category }}</strong>
-                <span style="font-weight: bold; color: #34495e;">${{ b.spent|floatformat:2 }} / ${{ b.limit|floatformat:2 }}</span>
-            </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; box-shadow: var(--shadow-sm);">
             
-            <div style="width: 100%; background-color: #ecf0f1; border-radius: 10px; height: 12px; overflow: hidden; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                <div>
+                    <strong style="font-size: 18px; color: var(--text-main); display: block;">{{ b.category }}</strong>
+                    <span style="font-size: 12px; color: var(--text-light);">
+                        {{ b.start_date|date:"M d" }} - {{ b.end_date|date:"M d, Y" }}
+                    </span>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 18px; font-weight: bold; color: var(--text-main);">${{ b.spent|floatformat:2 }}</span>
+                    <span style="font-size: 14px; color: var(--text-light);"> / ${{ b.limit|floatformat:2 }}</span>
+                </div>
+            </div>
+
+            <div style="width: 100%; background-color: var(--border-color); border-radius: 10px; height: 12px; overflow: hidden; margin-bottom: 10px;">
                 <div style="width: {{ b.percent }}%; background-color: {{ b.status_color }}; height: 100%; transition: width 0.5s ease-in-out;"></div>
             </div>
-            
-            <div style="font-size: 14px; text-align: right;">
-                {% if b.remaining >= 0 %}
-                    <span style="color: #7f8c8d;">${{ b.remaining|floatformat:2 }} remaining</span>
-                {% else %}
-                    <span style="color: #e74c3c; font-weight: bold;">Over budget by ${{ b.over_budget|floatformat:2 }}</span>
-                {% endif %}
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 10px;">
+                    <a href="{% url 'edit_budget' b.id %}" class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;">Edit</a>
+                    <a href="{% url 'delete_budget' b.id %}" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">Delete</a>
+                </div>
+                
+                <div style="font-size: 14px; font-weight: bold; color: {{ b.status_color }};">
+                    {% if b.remaining < 0 %}
+                        ${{ b.over_budget|floatformat:2 }} Over Budget
+                    {% else %}
+                        ${{ b.remaining|floatformat:2 }} Remaining
+                    {% endif %}
+                </div>
             </div>
         </div>
         {% empty %}
-        <div style="text-align: center; padding: 40px; background: #f9f9f9; border-radius: 8px;">
-            <p style="color: #7f8c8d; margin-bottom: 15px;">You haven't set up any budget limits yet.</p>
-            <p>Click the "Add Budget Limit" button above to add your first budget category (like "Groceries" or "Pets").</p>
+        <div style="text-align: center; padding: 40px; background: var(--bg-card); border-radius: 8px; border: 1px dashed var(--border-color);">
+            <p style="color: var(--text-light); margin-bottom: 15px;">You haven't set up any budget limits yet.</p>
+            <p>Click the "+ Add Budget Limit" button above to get started.</p>
         </div>
         {% endfor %}
     </div>

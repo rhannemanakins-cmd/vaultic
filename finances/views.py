@@ -395,3 +395,78 @@ def budget_dashboard(request):
         })
         
     return render(request, 'finances/budgets.html', {'budget_data': budget_data})
+# --- Add these to your budget_dashboard and dashboard logic ---
+
+@login_required
+def dashboard(request):
+    today = timezone.now().date()
+    first_of_month = today.replace(day=1)
+    # We create a "last of month" for the UI to show the range
+    import calendar
+    last_day = calendar.monthrange(today.year, today.month)[1]
+    last_of_month = today.replace(day=last_day)
+
+    all_income = Transaction.objects.filter(user=request.user, transaction_type='INCOME').aggregate(total=Sum('total_amount'))['total'] or 0
+    all_expenses = Transaction.objects.filter(user=request.user, transaction_type='EXPENSE').aggregate(total=Sum('total_amount'))['total'] or 0
+    total_balance = all_income - all_expenses
+
+    monthly_income = Transaction.objects.filter(user=request.user, transaction_type='INCOME', date__gte=first_of_month).aggregate(total=Sum('total_amount'))['total'] or 0
+    monthly_expenses = Transaction.objects.filter(user=request.user, transaction_type='EXPENSE', date__gte=first_of_month).aggregate(total=Sum('total_amount'))['total'] or 0
+
+    recent_transactions = Transaction.objects.filter(user=request.user).order_by('-date', '-id')[:5]
+
+    context = {
+        'total_balance': total_balance,
+        'monthly_income': monthly_income,
+        'monthly_expenses': monthly_expenses,
+        'recent_transactions': recent_transactions,
+        'start_date': first_of_month,  # Passed to UI
+        'end_date': last_of_month,      # Passed to UI
+    }
+    return render(request, 'finances/dashboard.html', context)
+
+@login_required
+def budget_dashboard(request):
+    today = timezone.now().date()
+    start_of_month = today.replace(day=1)
+    
+    budgets = Budget.objects.filter(user=request.user)
+    budget_data = []
+    
+    for budget in budgets:
+        # Spending calculation based on the transaction's link to this specific budget
+        spent_agg = Transaction.objects.filter(
+            user=request.user,
+            date__gte=start_of_month,
+            linked_budget=budget,
+            transaction_type='EXPENSE'
+        ).aggregate(total=Sum('total_amount'))
+        
+        spent = spent_agg['total'] or Decimal('0.00')
+        remaining = budget.amount - spent
+        percent = min(int((float(spent) / float(budget.amount)) * 100), 100) if budget.amount > 0 else 0
+            
+        budget_data.append({
+            'id': budget.id,
+            'category': budget.category,
+            'limit': budget.amount,
+            'spent': spent,
+            'remaining': remaining,
+            'percent': percent,
+            'start_date': budget.start_date, # From the model
+            'end_date': budget.end_date,     # From the model
+        })
+        
+    return render(request, 'finances/budgets.html', {'budget_data': budget_data})
+
+# NEW: Budget CRUD Views
+class BudgetUpdateView(UpdateView):
+    model = Budget
+    fields = ['budget_type', 'category', 'amount', 'start_date', 'end_date', 'vendor']
+    template_name = 'finances/budget_form.html'
+    success_url = reverse_lazy('budgets')
+
+class BudgetDeleteView(DeleteView):
+    model = Budget
+    template_name = 'finances/budget_confirm_delete.html'
+    success_url = reverse_lazy('budgets')
