@@ -379,28 +379,47 @@ def export_transactions_csv(request):
         writer.writerow([txn.date, txn.vendor, txn.transaction_type, txn.total_amount])
     return response
 @login_required
+@login_required
 def budget_dashboard(request):
+    # 1. Setup timeframe
     today = timezone.now().date()
     start_of_month = today.replace(day=1)
     
+    # 2. Get all budgets for this user
     budgets = Budget.objects.filter(user=request.user)
     budget_data = []
     
     for budget in budgets:
-        # NEW LOGIC: Filter Transactions by the linked_budget field
+        # 3. Calculate "Spent" using the NEW relational link
+        # We look for Transactions linked specifically to this Budget ID
         spent_agg = Transaction.objects.filter(
             user=request.user,
             date__gte=start_of_month,
-            linked_budget=budget # Direct relational link
-        ).aggregate(Sum('total_amount'))
+            linked_budget=budget,
+            transaction_type='EXPENSE' # Only count expenses toward budget limits
+        ).aggregate(total=Sum('total_amount'))
         
-        spent = spent_agg['total_amount__sum'] or Decimal('0.00')
+        spent = spent_agg['total'] or Decimal('0.00')
         remaining = budget.amount - spent
         
-        # ... (keep the rest of your percent and status_color logic) ...
-        
+        # 4. Calculate progress percentage
+        if budget.amount > 0:
+            # We use float() here to ensure the math doesn't crash if Types mismatch
+            percent = min(int((float(spent) / float(budget.amount)) * 100), 100)
+        else:
+            percent = 0
+            
+        # 5. Determine UI Status Color (OG Vaultic Logic)
+        if percent >= 90:
+            status_color = '#ef4444' # Danger Red
+        elif percent >= 75:
+            status_color = '#f59e0b' # Warning Orange
+        else:
+            status_color = '#10b981' # Success Green
+
+        # 6. Build the data package for the HTML
         budget_data.append({
-            'id': budget.id, # Good to have this for Edit/Delete buttons
+            'id': budget.id,
             'category': budget.category,
             'limit': budget.amount,
             'spent': spent,
