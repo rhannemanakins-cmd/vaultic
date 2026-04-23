@@ -13,56 +13,60 @@
         /* ==========================================
            1. THE DESIGN SYSTEM (Variables)
            ========================================== */
-:root {
-    /* The Core Brand */
-    --brand-primary: #795C34;   /* Rich saddle brown for buttons & logos */
-    --brand-danger: #9C4A3A;    /* A warm rust/terracotta for delete buttons */
-    
-    /* Backgrounds */
-    --bg-main: #FDFBF7;         /* Warm cream for the overall page background */
-    --bg-card: #FFFFFF;         /* Crisp white for the transaction table/cards */
-    
-    /* Typography */
-    --text-main: #3E2B1E;       /* Deep espresso instead of harsh black */
-    --text-light: #8A7360;      /* Muted taupe for secondary text/subtitles */
-    
-    /* Borders & Accents */
-    --border-color: #EAE3D9;    /* Soft tan for table borders and dividers */
-    --shadow-sm: 0 1px 3px rgba(62, 43, 30, 0.08); /* A warmer drop shadow */
-}
+        :root {
+            /* Your Custom Brand Colors */
+            --brand-primary: #92684D;   /* The darker warm brown */
+            --bg-card: #DAC5B8;         /* The lighter beige */
+            
+            /* Background & Text Fixes */
+            --bg-main: #F7EFEA;         /* Soft wash of beige for main background */
+            --text-main: #2A1A10;       /* Deep espresso (Dark enough to read) */
+            --text-light: #6A4B35;      /* Medium brown for secondary text */
+            
+            /* Accents & UI Elements */
+            --border-color: #C8B1A2;    /* Slightly darker beige for lines */
+            --shadow-sm: 0 4px 6px rgba(42, 26, 16, 0.08);
+            --shadow-md: 0 10px 15px -3px rgba(42, 26, 16, 0.1);
+            --radius: 12px;
+            
+            /* Button Colors */
+            --brand-danger: #A35245;    /* Warm rust for delete buttons */
+            --brand-success: #6A7B5E;   /* Muted warm green for success buttons */
+        }
 
         /* ==========================================
            2. GLOBAL RESETS
            ========================================== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-body);
-            color: var(--text-main);
+        body {
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-main); 
             display: flex; 
-            min-height: 100vh; 
-            line-height: 1.6;
+            min-height: 100vh;
         }
 
-        h1, h2, h3 { color: #0f172a; font-weight: 700; letter-spacing: -0.5px; }
+        h1, h2, h3 { color: var(--text-main); font-weight: 700; letter-spacing: -0.5px; }
 
         /* ==========================================
            3. THE SIDEBAR (Navigation)
            ========================================== */
         nav { 
             width: 260px; 
-            background: var(--bg-sidebar); 
-            color: white; 
+            background: var(--bg-card); /* Now uses your light beige */
+            color: var(--text-main); 
             padding: 30px 20px; 
             display: flex; 
             flex-direction: column; 
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px rgba(42, 26, 16, 0.05); /* Warmer shadow */
             z-index: 10;
+            border-right: 1px solid var(--border-color);
         }
         
         nav a { 
-            color: var(--text-sidebar); 
+            color: var(--text-main); /* Ensures links are dark espresso */
             display: block; 
             padding: 12px 15px; 
             text-decoration: none; 
@@ -73,8 +77,8 @@
         }
         
         nav a:hover { 
-            background: rgba(255,255,255,0.1); 
-            color: white; 
+            background: rgba(146, 104, 77, 0.1); /* Slight brown tint on hover */
+            color: var(--brand-primary); 
             transform: translateX(4px);
         }
 
@@ -93,12 +97,12 @@
             padding: 25px; 
             border-radius: var(--radius); 
             box-shadow: var(--shadow-md); 
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
             transition: transform 0.2s ease;
         }
 
         .card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 15px -3px rgba(42, 26, 16, 0.08);
         }
 
         /* ==========================================
@@ -107,36 +111,56 @@
         input, select {
             width: 100%;
             padding: 10px 12px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             font-family: 'Inter', sans-serif;
             margin-top: 4px;
             margin-bottom: 16px;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: var(--bg-main); /* Ensures inputs stand out slightly */
+            color: var(--text-main);
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: var(--brand-primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 3px rgba(146, 104, 77, 0.2); /* Brown focus ring */
         }
 
         .btn-primary { background: var(--brand-primary); color: white; }
         .btn-success { background: var(--brand-success); color: white; }
         .btn-danger { background: var(--brand-danger); color: white; }
         
-        .auth-section { margin-top: auto; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .auth-btn { display: block; width: 100%; padding: 12px; text-align: center; text-decoration: none; border-radius: 8px; font-weight: 600; margin-bottom: 10px; transition: opacity 0.2s; border: none; cursor: pointer; font-size: 14px;}
+        .auth-section { 
+            margin-top: auto; 
+            padding-top: 25px; 
+            border-top: 1px solid var(--border-color); 
+        }
+        
+        .auth-btn { 
+            display: block; 
+            width: 100%; 
+            padding: 12px; 
+            text-align: center; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            margin-bottom: 10px; 
+            transition: opacity 0.2s; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 14px;
+        }
+        
         .auth-btn:hover { opacity: 0.9; }
-
     </style>
 </head>
 <body>
     <nav>
         <div>
-            <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-top: 0; margin-bottom: 30px; color: white; padding-left: 10px;">
-    <span style="color: var(--brand-primary);">T</span>illyBudget<span style="color: var(--brand-primary);">.</span>
-</h2>
+            <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-top: 0; margin-bottom: 30px; color: var(--text-main); padding-left: 10px;">
+                <span style="color: var(--brand-primary);">T</span>illyBudget<span style="color: var(--brand-primary);">.</span>
+            </h2>
             <a href="{% url 'dashboard' %}">Dashboard</a>
             <a href="{% url 'budgets' %}">Budgets</a>
             <a href="{% url 'debts' %}">Debt Tracker</a>
@@ -148,8 +172,8 @@
 
         <div class="auth-section">
             {% if user.is_authenticated %}
-                <p style="color: var(--text-sidebar); font-size: 13px; margin-bottom: 15px; padding-left: 10px;">
-                    Welcome back,<br><span style="color: white; font-size: 16px; font-weight: 600;">{{ user.userprofile.preferred_name|default:user.username }}</span>
+                <p style="color: var(--text-light); font-size: 13px; margin-bottom: 15px; padding-left: 10px;">
+                    Welcome back,<br><span style="color: var(--text-main); font-size: 16px; font-weight: 600;">{{ user.userprofile.preferred_name|default:user.username }}</span>
                 </p>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
