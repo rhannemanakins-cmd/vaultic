@@ -13,26 +13,26 @@
         /* ==========================================
            1. THE DESIGN SYSTEM (Midnight & Sapphire)
            ========================================== */
-        :root {
-            /* Brand & Accents */
-            --brand-primary: #3B82F6;   /* Vibrant Sapphire Blue */
-            --brand-danger: #EF4444;    /* Bright red for delete */
-            --brand-success: #10B981;   /* Emerald green for success */
-            
-            /* Backgrounds */
-            --bg-main: #0F172A;         /* Deepest midnight for main background */
-            --bg-card: #1E293B;         /* Slate dark for cards & sidebar */
-            
-            /* Typography */
-            --text-main: #F8FAFC;       /* Crisp white for readable text */
-            --text-light: #94A3B8;      /* Muted blue-gray for subtitles/labels */
-            
-            /* UI Elements */
-            --border-color: #334155;    /* Subtle dark border for tables/dividers */
-            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-            --radius: 12px;
-        }
+:root {
+    /* Brand Accent */
+    --brand-primary: #3B82F6;   /* The vibrant sapphire blue (Dashboard icon, 2.5% text) */
+    
+    /* Backgrounds */
+    --bg-main: #0F172A;         /* The deepest midnight (Main content area background) */
+    --bg-card: #1E293B;         /* The lighter slate (Sidebar and the "Total Balance" card) */
+    
+    /* Typography */
+    --text-main: #F8FAFC;       /* Pure, crisp white for headers and amounts */
+    --text-light: #94A3B8;      /* Muted gray-blue for subtitles and table headers */
+    
+    /* Accents & UI */
+    --border-color: #334155;    /* Subtle line below "Recent Transactions" headers */
+    --brand-danger: #EF4444;    
+    --brand-success: #10B981;   
+    --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    --radius: 12px;
+}
 
         /* ==========================================
            2. GLOBAL RESETS
@@ -81,6 +81,11 @@
             color: var(--brand-primary); 
             transform: translateX(4px);
         }
+        .nav-link-active {
+    background: rgba(59, 130, 246, 0.15); /* 15% opacity of the Sapphire Blue */
+    color: var(--brand-primary);
+    border-left: 3px solid var(--brand-primary); /* Optional: adds a nice left edge */
+}
 
         /* ==========================================
            4. MAIN CONTENT & CARDS
@@ -124,6 +129,7 @@
         }
 
         /* Base Button Styles */
+    /* Base Button Styles */
         .btn {
             display: inline-block;
             padding: 10px 18px;
@@ -137,28 +143,29 @@
             text-align: center;
         }
 
-        /* The Sapphire Primary Button */
+        /* The Sapphire Primary Button (+ Quick Add) */
         .btn-primary { 
             background: var(--brand-primary); 
-            color: white; 
+            color: #FFFFFF; 
             box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
         }
         .btn-primary:hover { 
-            background: #2563EB; /* Darker sapphire on hover */
+            background: #2563EB; /* Slightly darker sapphire */
             transform: translateY(-1px);
         }
 
-        /* The Outline Button (For CSV & Pagination) */
+        /* The Ghost Outline Button (Download CSV & Pagination) */
         .btn-outline {
-            background: var(--bg-card);
-            color: var(--text-main);
+            background: transparent;
+            color: var(--text-light); /* Muted text so it doesn't distract */
             border: 1px solid var(--border-color);
         }
         .btn-outline:hover {
-            background: var(--border-color);
-            color: white;
+            background: rgba(255, 255, 255, 0.05); /* Very subtle light wash */
+            color: var(--text-main); /* Text lights up white on hover */
+            border-color: #475569; /* Border gets slightly brighter */
         }
-
+        
         /* Sidebar Auth Buttons */
         .auth-section { margin-top: auto; padding-top: 25px; border-top: 1px solid var(--border-color); }
         .btn-success { background: var(--brand-success); color: white; }
@@ -174,7 +181,7 @@
             <h2 style="font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-top: 0; margin-bottom: 30px; color: var(--text-main); padding-left: 10px;">
                 <span style="color: var(--brand-primary);">T</span>illyBudget<span style="color: var(--brand-primary);">.</span>
             </h2>
-            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'dashboard' %}" class="nav-link-active">Dashboard</a>
             <a href="{% url 'budgets' %}">Budgets</a>
             <a href="{% url 'debts' %}">Debt Tracker</a>
             <a href="{% url 'expenses' %}">Expenses</a>
