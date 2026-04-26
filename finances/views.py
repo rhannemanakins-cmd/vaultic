@@ -477,7 +477,7 @@ def ai_advisor_chat(request):
 
             # 3. Build the System Instruction
             system_prompt = f"""
-            You are the Tilly Budget AI Assistant, a professional and helpful financial advisor.
+            You are TillyBot, a professional and helpful financial advisor for the Tilly Budget app.
             Do not give generic advice if the user asks about their own finances. Use the exact data provided below to answer their questions.
             If they ask a 'what-if' math question (like raising a loan payment), calculate the new payoff time or interest saved based on the data below.
             
