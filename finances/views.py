@@ -3,7 +3,7 @@ import csv
 import datetime
 import calendar
 from decimal import Decimal
-
+from .models import UserProfile, SavingsGoal, Debt, Budget, Transaction, TransactionLineItem
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
@@ -458,44 +458,73 @@ from google.genai import types
 def ai_advisor_chat(request):
     if request.method == 'POST':
         try:
-            # 1. Catch the message AND the history from the frontend
             data = json.loads(request.body)
             user_message = data.get('message', '')
             chat_history = data.get('history', [])
 
-            # 2. Build the memory transcript (Last 6 messages for context)
+            # 1. Build the memory transcript (Last 6 messages)
             transcript = "\n--- RECENT CONVERSATION HISTORY ---\n"
             for msg in chat_history[-6:]:
                 role = "User" if msg.get('isUser') else "TillyBot"
                 transcript += f"{role}: {msg.get('text')}\n"
             transcript += "-----------------------------------\n"
 
-            # 3. Gather the User's Live Context
-            debts = Debt.objects.filter(user=request.user)
-            debt_context = "User's Current Liabilities:\n"
-            for debt in debts:
-                debt_context += f"- {debt.name} ({debt.vendor}): ${debt.principal_balance} balance at {debt.interest_rate}% interest.\n"
+            # 2. Gather the User's FULL Live Context Based on Actual Models
+            
+            # --- Profile ---
+            profile = UserProfile.objects.filter(user=request.user).first()
+            user_name = profile.preferred_name if profile else "the user"
+            profile_context = f"The user's preferred name is {user_name}.\n"
 
+            # --- A. SAVINGS GOALS ---
+            savings = SavingsGoal.objects.filter(user=request.user)
+            savings_context = "\nSavings Goals:\n"
+            for s in savings:
+                savings_context += f"- {s.name}: ${s.current_balance} saved out of a ${s.target_amount} target.\n"
+
+            # --- B. INCOME & EXPENSE BUDGETS ---
             budgets = Budget.objects.filter(user=request.user)
-            budget_context = "\nUser's Monthly Budgets:\n"
+            income_context = "\nExpected Income:\n"
+            expense_context = "\nExpense Budgets:\n"
             for b in budgets:
-                budget_context += f"- {b.category}: ${b.amount} limit.\n"
+                if b.budget_type == 'INCOME':
+                    income_context += f"- {b.category}: ${b.amount} expected.\n"
+                else:
+                    expense_context += f"- {b.category}: ${b.amount} limit.\n"
 
-            # 4. Build the System Instruction
+            # --- C. DEBTS ---
+            debts = Debt.objects.filter(user=request.user)
+            debt_context = "\nCurrent Debts/Liabilities:\n"
+            for d in debts:
+                debt_context += f"- {d.name} ({d.vendor}): ${d.principal_balance} balance at {d.interest_rate}% interest. Monthly payment is ${d.monthly_payment}, due on day {d.due_date} of the month.\n"
+
+            # --- D. RECENT TRANSACTIONS ---
+            transactions = Transaction.objects.filter(user=request.user).order_by('-date')[:10]
+            transaction_context = "\nLast 10 Transactions:\n"
+            for t in transactions:
+                transaction_context += f"- {t.date}: {t.transaction_type} of ${t.total_amount} at {t.vendor}.\n"
+
+            # 3. Build the Master System Instruction
             system_prompt = f"""
             You are TillyBot, a professional and helpful financial advisor for the Tilly Budget app.
-            Do not give generic advice if the user asks about their own finances. Use the exact data provided below to answer their questions.
-            If they ask a 'what-if' math question, calculate the new payoff time or interest saved based on the data below.
+            You have access to the user's complete financial profile. Do not give generic advice. Use the exact data provided below to answer their questions.
+            If they ask a 'what-if' math question, calculate the impact based on their actual income, savings, debts, and budgets. Address the user by their preferred name occasionally.
             
+            --- USER FINANCIAL DATA ---
+            {profile_context}
+            {savings_context}
+            {income_context}
+            {expense_context}
             {debt_context}
-            {budget_context}
+            {transaction_context}
+            ---------------------------
             
             {transcript}
             
             Keep your answers concise, formatting with short paragraphs or bullet points. Do not use complex markdown that a standard chat window can't render.
             """
 
-            # 5. Call the Gemini API
+            # 4. Call the Gemini API
             client = genai.Client(api_key=settings.GEMINI_API_KEY)
             
             response = client.models.generate_content(
@@ -503,15 +532,15 @@ def ai_advisor_chat(request):
                 contents=user_message,
                 config=types.GenerateContentConfig(
                     system_instruction=system_prompt,
-                    temperature=0.2, # Low temperature keeps the math accurate
+                    temperature=0.2, 
                 )
             )
 
-            # 6. Send the answer back to the chat window
+            # 5. Send the answer back to the chat window
             return JsonResponse({'status': 'success', 'response': response.text})
 
         except Exception as e:
-            print(f"AI Error: {e}") # This prints to your Render logs if it crashes
+            print(f"AI Error: {e}") 
             return JsonResponse({'status': 'error', 'message': 'The AI is currently taking a coffee break. Try again in a minute!'}, status=500)
             
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
