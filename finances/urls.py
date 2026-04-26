@@ -30,5 +30,5 @@ urlpatterns = [
     path('savings/<int:pk>/delete/', views.SavingsDeleteView.as_view(), name='delete_saving'),
 
     # AI Chat API
-    path('api/chat/', finance_views.ai_advisor_chat, name='ai_chat'),
+path('api/chat/', views.ai_advisor_chat, name='ai_chat'),
 ]
