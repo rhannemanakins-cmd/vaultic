@@ -207,5 +207,138 @@
         {% block content %}
         {% endblock %}
     </main>
+    <button id="chatbot-toggle" style="position: fixed; bottom: 30px; right: 30px; background: var(--brand-primary, #3498db); color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;">
+    🤖
+</button>
+
+<div id="chatbot-window" style="position: fixed; bottom: 100px; right: 30px; width: 350px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 1000; display: none; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0;">
+    
+    <div style="background: var(--brand-primary, #3498db); color: white; padding: 15px; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <span>Tilly AI Advisor</span>
+        <button id="chatbot-close" style="background: none; border: none; color: white; cursor: pointer; font-size: 16px;">✖</button>
+    </div>
+
+    <div id="chatbot-messages" style="flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f8fafc;">
+        <div style="background: #e2e8f0; color: #1e293b; padding: 10px 14px; border-radius: 12px; max-width: 80%; align-self: flex-start; font-size: 14px;">
+            Hi! I'm your Tilly Budget AI. Ask me about your budget pacing, or how to pay off your loans faster!
+        </div>
+    </div>
+
+    <div style="padding: 15px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px;">
+        <input type="text" id="chatbot-input" placeholder="Ask about your finances..." style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; font-size: 14px;">
+        <button id="chatbot-send" style="background: var(--brand-primary, #3498db); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">Send</button>
+    </div>
+</div>
+
+{% csrf_token %}
+
+<script>
+    const toggleBtn = document.getElementById('chatbot-toggle');
+    const closeBtn = document.getElementById('chatbot-close');
+    const chatWindow = document.getElementById('chatbot-window');
+    const sendBtn = document.getElementById('chatbot-send');
+    const inputField = document.getElementById('chatbot-input');
+    const messagesDiv = document.getElementById('chatbot-messages');
+
+    // Toggle Window Visibility
+    toggleBtn.addEventListener('click', () => chatWindow.style.display = 'flex');
+    closeBtn.addEventListener('click', () => chatWindow.style.display = 'none');
+
+    // Helper: Get CSRF Token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Add a message bubble to the chat
+    function appendMessage(text, isUser) {
+        const msgDiv = document.createElement('div');
+        msgDiv.style.padding = '10px 14px';
+        msgDiv.style.borderRadius = '12px';
+        msgDiv.style.maxWidth = '80%';
+        msgDiv.style.fontSize = '14px';
+        msgDiv.style.marginBottom = '10px';
+        
+        if (isUser) {
+            msgDiv.style.background = 'var(--brand-primary, #3498db)';
+            msgDiv.style.color = 'white';
+            msgDiv.style.alignSelf = 'flex-end';
+        } else {
+            msgDiv.style.background = '#e2e8f0';
+            msgDiv.style.color = '#1e293b';
+            msgDiv.style.alignSelf = 'flex-start';
+            // Convert simple line breaks to HTML for AI formatting
+            msgDiv.innerHTML = text.replace(/\n/g, '<br>');
+        }
+        
+        messagesDiv.appendChild(msgDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to bottom
+    }
+
+    // The core Send function
+    async function sendMessage() {
+        const text = inputField.value.trim();
+        if (!text) return;
+
+        // 1. Show User Message
+        appendMessage(text, true);
+        inputField.value = '';
+
+        // 2. Show "Typing..." indicator
+        const typingId = "typing-" + Date.now();
+        const typingDiv = document.createElement('div');
+        typingDiv.id = typingId;
+        typingDiv.textContent = 'Thinking...';
+        typingDiv.style.alignSelf = 'flex-start';
+        typingDiv.style.fontSize = '12px';
+        typingDiv.style.color = '#94a3b8';
+        messagesDiv.appendChild(typingDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        // 3. Send to Django API
+        try {
+            const response = await fetch('/api/chat/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') // Vital for Django security!
+                },
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await response.json();
+            
+            // Remove typing indicator
+            document.getElementById(typingId).remove();
+
+            // 4. Show AI Response
+            if (data.status === 'success') {
+                appendMessage(data.response, false);
+            } else {
+                appendMessage("Error: " + data.message, false);
+            }
+
+        } catch (error) {
+            document.getElementById(typingId).remove();
+            appendMessage("Connection error. Is the server running?", false);
+        }
+    }
+
+    // Trigger send on button click or Enter key
+    sendBtn.addEventListener('click', sendMessage);
+    inputField.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+</script>
 </body>
 </html>

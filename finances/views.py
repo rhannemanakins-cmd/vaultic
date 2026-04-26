@@ -443,3 +443,67 @@ def export_transactions_csv(request):
     for txn in Transaction.objects.filter(user=request.user).order_by('-date'):
         writer.writerow([txn.date, txn.vendor, txn.transaction_type, txn.total_amount])
     return response
+
+# --- Add these imports at the very top of your views.py file ---
+import json
+from django.http import JsonResponse
+from django.conf import settings
+from google import genai
+from google.genai import types
+
+# ==========================================
+# AI ADVISOR ENDPOINT
+# ==========================================
+@login_required
+def ai_advisor_chat(request):
+    if request.method == 'POST':
+        try:
+            # 1. Catch the message from the frontend
+            data = json.loads(request.body)
+            user_message = data.get('message', '')
+
+            # 2. Gather the User's Live Context (The Data Bridge)
+            # Grab all debts to pass to the AI
+            debts = Debt.objects.filter(user=request.user)
+            debt_context = "User's Current Liabilities:\n"
+            for debt in debts:
+                debt_context += f"- {debt.name} ({debt.vendor}): ${debt.principal_balance} balance at {debt.interest_rate}% interest.\n"
+
+            # Grab current budgets
+            budgets = Budget.objects.filter(user=request.user)
+            budget_context = "\nUser's Monthly Budgets:\n"
+            for b in budgets:
+                budget_context += f"- {b.category}: ${b.amount} limit.\n"
+
+            # 3. Build the System Instruction
+            system_prompt = f"""
+            You are the Tilly Budget AI Assistant, a professional and helpful financial advisor.
+            Do not give generic advice if the user asks about their own finances. Use the exact data provided below to answer their questions.
+            If they ask a 'what-if' math question (like raising a loan payment), calculate the new payoff time or interest saved based on the data below.
+            
+            {debt_context}
+            {budget_context}
+            
+            Keep your answers concise, formatting with short paragraphs or bullet points. Do not use complex markdown that a standard chat window can't render.
+            """
+
+            # 4. Call the Gemini API
+            client = genai.Client(api_key=settings.GEMINI_API_KEY)
+            
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=user_message,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    temperature=0.2, # Low temperature keeps the math more accurate
+                )
+            )
+
+            # 5. Send the answer back to the chat window
+            return JsonResponse({'status': 'success', 'response': response.text})
+
+        except Exception as e:
+            print(f"AI Error: {e}") # This prints to your Render logs if it crashes
+            return JsonResponse({'status': 'error', 'message': 'The AI is currently taking a coffee break. Try again in a minute!'}, status=500)
+            
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
