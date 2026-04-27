@@ -29,8 +29,7 @@ class TransactionForm(forms.ModelForm):
 class TransactionLineItemForm(forms.ModelForm):
     class Meta:
         model = TransactionLineItem
-        # REMOVED linked_debt and linked_savings from here to fix the crash
-        fields = ['category', 'amount']
+        fields = ['linked_budget', 'amount'] # <-- THE FIX
 
 # This links Transaction to Line Items
 TransactionLineItemFormSet = inlineformset_factory(
