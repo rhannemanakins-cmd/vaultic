@@ -335,14 +335,17 @@
         messagesDiv.appendChild(typingDiv);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-        try {
+try {
             const response = await fetch('/api/chat/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken')
                 },
-                body: JSON.stringify({ message: text })
+                body: JSON.stringify({ 
+                    message: text,
+                    history: chatHistory // <-- NEW: Sending the memory array!
+                })
             });
 
             const data = await response.json();

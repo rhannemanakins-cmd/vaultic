@@ -13,7 +13,43 @@
                 {% endif %}
             </div>
         {% endfor %}
+        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-bottom: 20px; margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="font-size: 16px; margin: 0; color: #334155;">Line Item Splits (Optional)</h3>
+                <button type="button" id="add-split-btn" style="background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">+ Add Split</button>
+            </div>
+            
+            <div id="splits-container">
+                <div class="split-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" name="split_category[]" placeholder="Category (e.g. Groceries)" style="flex: 2; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                    <input type="number" step="0.01" name="split_amount[]" placeholder="$ Amount" style="flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                    <button type="button" class="remove-split-btn" style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">✖</button>
+                </div>
+            </div>
+        </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Save Transaction</button>
     </form>
 </div>
 {% endblock %}
+<script>
+    document.getElementById('add-split-btn').addEventListener('click', function() {
+        const container = document.getElementById('splits-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'split-row';
+        newRow.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px;';
+        
+        newRow.innerHTML = `
+            <input type="text" name="split_category[]" placeholder="Category" style="flex: 2; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+            <input type="number" step="0.01" name="split_amount[]" placeholder="$ Amount" style="flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+            <button type="button" class="remove-split-btn" style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">✖</button>
+        `;
+        
+        container.appendChild(newRow);
+    });
+
+    document.getElementById('splits-container').addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-split-btn')) {
+            e.target.closest('.split-row').remove();
+        }
+    });
+</script>
