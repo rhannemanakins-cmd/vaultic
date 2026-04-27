@@ -476,21 +476,26 @@ def ai_advisor_chat(request):
             user_name = profile.preferred_name if profile else "the user"
             profile_context = f"The user's preferred name is {user_name}.\n"
 
-            # --- A. SAVINGS GOALS ---
+# --- A. SAVINGS GOALS ---
             savings = SavingsGoal.objects.filter(user=request.user)
             savings_context = "\nSavings Goals:\n"
             for s in savings:
-                savings_context += f"- {s.name}: ${s.current_balance} saved out of a ${s.target_amount} target.\n"
+                # Format optional fields safely
+                date_str = f" Target Date: {s.target_date}." if s.target_date else ""
+                req_str = f" Required monthly contribution: ${s.monthly_contribution_requirement}." if s.monthly_contribution_requirement else ""
+                rate_str = f" Interest rate: {s.interest_rate}%." if s.interest_rate else ""
+                
+                savings_context += f"- {s.name}: ${s.current_balance} saved out of ${s.target_amount} ({s.percent_reached}% reached).{date_str}{req_str}{rate_str}\n"
 
-            # --- B. INCOME & EXPENSE BUDGETS ---
+# --- B. INCOME & EXPENSE BUDGETS ---
             budgets = Budget.objects.filter(user=request.user)
             income_context = "\nExpected Income:\n"
             expense_context = "\nExpense Budgets:\n"
             for b in budgets:
                 if b.budget_type == 'INCOME':
-                    income_context += f"- {b.category}: ${b.amount} expected.\n"
+                    income_context += f"- {b.category}: ${b.amount} expected between {b.start_date} and {b.end_date}.\n"
                 else:
-                    expense_context += f"- {b.category}: ${b.amount} limit.\n"
+                    expense_context += f"- {b.category}: ${b.amount} limit between {b.start_date} and {b.end_date}.\n"
 
             # --- C. DEBTS ---
             debts = Debt.objects.filter(user=request.user)
