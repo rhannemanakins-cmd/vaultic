@@ -14,6 +14,10 @@ from django.urls import reverse_lazy
 from django.db.models import Sum, Count, Avg
 from django.db.models.functions import TruncMonth
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import Transaction, TransactionLineItem
 
 from .models import Transaction, TransactionLineItem, Budget, Debt, SavingsGoal, UserProfile
 from .forms import TransactionForm, BudgetForm, DebtForm, SavingsGoalForm, ExtendedRegistrationForm
@@ -163,6 +167,36 @@ def delete_transaction(request, pk):
         return redirect('dashboard')
     return render(request, 'finances/transaction_confirm_delete.html', {'transaction': txn})
 
+class TransactionCreateView(LoginRequiredMixin, CreateView):
+    model = Transaction
+    # These are your base transaction fields
+    fields = ['date', 'vendor', 'total_amount', 'transaction_type', 'notes', 'linked_budget', 'linked_debt', 'linked_savings'] 
+    template_name = 'finances/transaction_form.html'
+    success_url = reverse_lazy('transaction_list') # Redirects to your list view after saving
+
+    def form_valid(self, form):
+        # 1. Attach the currently logged-in user to the transaction
+        form.instance.user = self.request.user
+        
+        # 2. Save the main transaction to the database
+        # This populates 'self.object' with the new Transaction record
+        response = super().form_valid(form)
+
+        # 3. Catch the dynamic arrays from the frontend form
+        categories = self.request.POST.getlist('split_category[]')
+        amounts = self.request.POST.getlist('split_amount[]')
+
+        # 4. Loop through and create the Line Items
+        for category, amount in zip(categories, amounts):
+            if category.strip() and amount.strip():
+                TransactionLineItem.objects.create(
+                    transaction=self.object, # Link to the newly saved transaction
+                    category=category,
+                    amount=amount
+                )
+
+        # 5. Finish the redirect
+        return response
 # ==========================================
 # BUDGET DASHBOARD
 # ==========================================
