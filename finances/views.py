@@ -124,20 +124,37 @@ def budget_dashboard(request):
 # ==========================================
 # TRANSACTION MANAGEMENT
 # ==========================================
-class TransactionCreateView(CreateView):
+class TransactionCreateView(LoginRequiredMixin, CreateView):
     model = Transaction
-    form_class = TransactionForm
+    fields = ['date', 'vendor', 'total_amount', 'transaction_type', 'notes', 'linked_budget', 'linked_debt', 'linked_savings'] 
     template_name = 'finances/transaction_form.html'
-    success_url = reverse_lazy('transaction_list')
+    success_url = reverse_lazy('transaction_list') 
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user 
-        return kwargs
+    # NEW: Send the user's expense budgets to the HTML template
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Only grab EXPENSE budgets for them to choose from
+        context['user_budgets'] = Budget.objects.filter(user=self.request.user, budget_type='EXPENSE')
+        return context
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+
+        # NEW: Catch the array of Budget IDs instead of text strings
+        budget_ids = self.request.POST.getlist('split_budget_id[]')
+        amounts = self.request.POST.getlist('split_amount[]')
+
+        for budget_id, amount in zip(budget_ids, amounts):
+            if budget_id and amount.strip(): # Ensure they actually selected a budget and typed an amount
+                budget_instance = Budget.objects.get(id=budget_id, user=self.request.user)
+                TransactionLineItem.objects.create(
+                    transaction=self.object,
+                    linked_budget=budget_instance, # Link the actual database record!
+                    amount=amount
+                )
+
+        return response
 
 @login_required
 def transaction_list(request):
@@ -166,37 +183,6 @@ def delete_transaction(request, pk):
         txn.delete()
         return redirect('dashboard')
     return render(request, 'finances/transaction_confirm_delete.html', {'transaction': txn})
-
-class TransactionCreateView(LoginRequiredMixin, CreateView):
-    model = Transaction
-    # These are your base transaction fields
-    fields = ['date', 'vendor', 'total_amount', 'transaction_type', 'notes', 'linked_budget', 'linked_debt', 'linked_savings'] 
-    template_name = 'finances/transaction_form.html'
-    success_url = reverse_lazy('transaction_list') # Redirects to your list view after saving
-
-    def form_valid(self, form):
-        # 1. Attach the currently logged-in user to the transaction
-        form.instance.user = self.request.user
-        
-        # 2. Save the main transaction to the database
-        # This populates 'self.object' with the new Transaction record
-        response = super().form_valid(form)
-
-        # 3. Catch the dynamic arrays from the frontend form
-        categories = self.request.POST.getlist('split_category[]')
-        amounts = self.request.POST.getlist('split_amount[]')
-
-        # 4. Loop through and create the Line Items
-        for category, amount in zip(categories, amounts):
-            if category.strip() and amount.strip():
-                TransactionLineItem.objects.create(
-                    transaction=self.object, # Link to the newly saved transaction
-                    category=category,
-                    amount=amount
-                )
-
-        # 5. Finish the redirect
-        return response
 # ==========================================
 # BUDGET DASHBOARD
 # ==========================================

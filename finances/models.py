@@ -117,8 +117,12 @@ class Transaction(models.Model):
 # ==========================================
 class TransactionLineItem(models.Model):
     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='line_items')
-    category = models.CharField(max_length=100)
+    
+    # REPLACED CharField WITH A RELATIONAL FOREIGN KEY
+    linked_budget = models.ForeignKey(Budget, on_delete=models.SET_NULL, null=True, blank=True, related_name='split_transactions')
+    
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.category} - ${self.amount}"
+        budget_name = self.linked_budget.category if self.linked_budget else "Uncategorized"
+        return f"{budget_name} - ${self.amount}"

@@ -1,9 +1,11 @@
 {% extends 'finances/base.html' %}
+
 {% block content %}
 <div class="card" style="max-width: 600px; margin: 0 auto;">
     <h2>Add Transaction</h2>
     <form method="post">
         {% csrf_token %}
+        
         {% for field in form %}
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: 600; margin-bottom: 5px;">{{ field.label }}</label>
@@ -13,6 +15,7 @@
                 {% endif %}
             </div>
         {% endfor %}
+        
         <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-bottom: 20px; margin-top: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h3 style="font-size: 16px; margin: 0; color: #334155;">Line Item Splits (Optional)</h3>
@@ -20,32 +23,46 @@
             </div>
             
             <div id="splits-container">
-                <div class="split-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <input type="text" name="split_category[]" placeholder="Category (e.g. Groceries)" style="flex: 2; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
-                    <input type="number" step="0.01" name="split_amount[]" placeholder="$ Amount" style="flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
-                    <button type="button" class="remove-split-btn" style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">✖</button>
                 </div>
-            </div>
         </div>
+        
         <button type="submit" class="btn btn-primary" style="width: 100%;">Save Transaction</button>
     </form>
 </div>
-{% endblock %}
+
 <script>
-    document.getElementById('add-split-btn').addEventListener('click', function() {
+    // 1. Create a variable that holds all the budget <option> tags from Django
+    const budgetOptions = `
+        <option value="">-- Select Budget --</option>
+        {% for b in user_budgets %}
+            <option value="{{ b.id }}">{{ b.category }}</option>
+        {% endfor %}
+    `;
+
+    // 2. The function to add a new row
+    function addSplitRow() {
         const container = document.getElementById('splits-container');
         const newRow = document.createElement('div');
         newRow.className = 'split-row';
         newRow.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px;';
         
+        // Notice we replaced the text <input> with a <select>
         newRow.innerHTML = `
-            <input type="text" name="split_category[]" placeholder="Category" style="flex: 2; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
-            <input type="number" step="0.01" name="split_amount[]" placeholder="$ Amount" style="flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+            <select name="split_budget_id[]" style="flex: 2; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;" required>
+                ${budgetOptions}
+            </select>
+            <input type="number" step="0.01" name="split_amount[]" placeholder="$ Amount" style="flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;" required>
             <button type="button" class="remove-split-btn" style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">✖</button>
         `;
         
         container.appendChild(newRow);
-    });
+    }
+
+    // 3. Add the first blank row automatically when the page loads
+    addSplitRow();
+
+    // 4. Button click listeners
+    document.getElementById('add-split-btn').addEventListener('click', addSplitRow);
 
     document.getElementById('splits-container').addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-split-btn')) {
@@ -53,3 +70,4 @@
         }
     });
 </script>
+{% endblock %}
