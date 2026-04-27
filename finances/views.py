@@ -503,11 +503,38 @@ def ai_advisor_chat(request):
             for d in debts:
                 debt_context += f"- {d.name} ({d.vendor}): ${d.principal_balance} balance at {d.interest_rate}% interest. Monthly payment is ${d.monthly_payment}, due on day {d.due_date} of the month.\n"
 
-            # --- D. RECENT TRANSACTIONS ---
-            transactions = Transaction.objects.filter(user=request.user).order_by('-date')[:10]
+# --- D. RECENT TRANSACTIONS ---
+            # Using prefetch_related for database efficiency!
+            transactions = Transaction.objects.filter(user=request.user).prefetch_related('line_items').order_by('-date')[:10]
             transaction_context = "\nLast 10 Transactions:\n"
+            
             for t in transactions:
-                transaction_context += f"- {t.date}: {t.transaction_type} of ${t.total_amount} at {t.vendor}.\n"
+                # 1. Base Information
+                t_str = f"- {t.date}: {t.transaction_type} of ${t.total_amount} at {t.vendor}."
+                
+                # 2. Check for Relational Links (What did this pay for?)
+                links = []
+                if t.linked_budget:
+                    links.append(f"Budget: {t.linked_budget.category}")
+                if t.linked_debt:
+                    links.append(f"Debt: {t.linked_debt.name}")
+                if t.linked_savings:
+                    links.append(f"Savings Goal: {t.linked_savings.name}")
+                
+                if links:
+                    t_str += f" (Linked to: {', '.join(links)})."
+                
+                # 3. Check for Notes
+                if t.notes:
+                    t_str += f" Notes: '{t.notes}'."
+                
+                # 4. Check for Line Item Splits
+                line_items = t.line_items.all()
+                if line_items:
+                    splits = [f"{li.category} (${li.amount})" for li in line_items]
+                    t_str += f" Splits: [{', '.join(splits)}]."
+                
+                transaction_context += t_str + "\n"
 
             # 3. Build the Master System Instruction
             system_prompt = f"""
