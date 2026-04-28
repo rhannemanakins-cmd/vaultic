@@ -29,15 +29,14 @@ class TransactionForm(forms.ModelForm):
 class TransactionLineItemForm(forms.ModelForm):
     class Meta:
         model = TransactionLineItem
-        fields = ['linked_budget', 'amount'] # <-- THE FIX
+        fields = ['linked_budget', 'amount']
 
-# This links Transaction to Line Items
 TransactionLineItemFormSet = inlineformset_factory(
-    Transaction, 
-    TransactionLineItem, 
-    fields=['category', 'amount'], # Fixed: No more "Unknown Field" error
-    extra=1, 
-    can_delete=True 
+    Transaction,
+    TransactionLineItem,
+    fields=['linked_budget', 'amount'], # <-- THE FIX
+    extra=1,
+    can_delete=True
 )
 
 # ==========================================
