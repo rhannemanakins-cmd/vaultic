@@ -1,14 +1,30 @@
 {% extends 'finances/base.html' %}
+
 {% block content %}
-<div class="card" style="max-width: 500px; margin: 60px auto; text-align: center;">
-    <h2>Delete Budget?</h2>
-    <p>Are you sure you want to delete the <strong>"{{ object.category }}"</strong> budget?</p>
+<div class="card" style="max-width: 480px; margin: 80px auto; text-align: center; padding: 40px 30px;">
+    
+    <div style="background: #fee2e2; color: var(--brand-danger); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+    </div>
+
+    <h2 style="margin-bottom: 10px; color: var(--text-main);">Delete Budget?</h2>
+    
+    <p style="color: var(--text-light); font-size: 16px; margin-bottom: 30px; line-height: 1.5;">
+        Are you sure you want to permanently delete the <strong style="color: var(--text-main);">"{{ object.category }}"</strong> budget?<br>
+        <span style="font-size: 14px;">This action cannot be undone.</span>
+    </p>
+
     <form method="post">
         {% csrf_token %}
-        <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
-            <a href="{% url 'budgets' %}" class="btn btn-outline">Cancel</a>
-            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <div style="display: flex; justify-content: center; gap: 15px;">
+            <a href="{% url 'budgets' %}" class="btn btn-outline" style="min-width: 130px;">Cancel</a>
+            <button type="submit" class="btn btn-danger" style="min-width: 130px;">Yes, Delete</button>
         </div>
     </form>
+
 </div>
 {% endblock %}

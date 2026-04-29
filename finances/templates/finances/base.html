@@ -14,23 +14,16 @@
            1. THE DESIGN SYSTEM (The OG Vaultic Theme)
            ========================================== */
         :root {
-            /* Brand */
-            --brand-primary: #3b82f6;   /* Classic Vaultic Blue */
-            
-            /* Backgrounds */
-            --bg-sidebar: #1e293b;      /* Original Dark Slate Sidebar */
-            --bg-main: #f8fafc;         /* Clean off-white main background */
-            --bg-card: #ffffff;         /* Pure white cards */
-            
-            /* Typography */
-            --text-sidebar: #ffffff;    /* White text for sidebar */
-            --text-main: #0f172a;       /* Dark text for readability */
-            --text-light: #64748b;      /* Standard gray for subtitles */
-            
-            /* Accents */
-            --border-color: #e2e8f0;    /* Original light gray borders */
-            --brand-danger: #ef4444;    
-            --brand-success: #10b981;   
+            --brand-primary: #3b82f6; 
+            --bg-sidebar: #1e293b; 
+            --bg-main: #f8fafc; 
+            --bg-card: #ffffff; 
+            --text-sidebar: #ffffff; 
+            --text-main: #0f172a; 
+            --text-light: #64748b; 
+            --border-color: #e2e8f0; 
+            --brand-danger: #ef4444; 
+            --brand-success: #10b981; 
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
             --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
             --radius: 8px;
@@ -42,8 +35,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
-            margin: 0; 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
             background-color: var(--bg-main); 
             color: var(--text-main); 
             display: flex; 
@@ -67,7 +59,7 @@
         }
         
         nav a { 
-            color: #cbd5e1; /* Slightly muted white for links */
+            color: #cbd5e1; 
             display: block; 
             padding: 12px 15px; 
             text-decoration: none; 
@@ -128,7 +120,6 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); 
         }
 
-        /* Base Button Styles */
         .btn {
             display: inline-block;
             padding: 10px 18px;
@@ -142,34 +133,64 @@
             text-align: center;
         }
 
-        /* The Original Primary Button */
-        .btn-primary { 
-            background: var(--brand-primary); 
-            color: white; 
-            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-        }
-        .btn-primary:hover { 
-            background: #2563EB; 
-            transform: translateY(-1px);
-        }
+        .btn-primary { background: var(--brand-primary); color: white; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover { background: #2563EB; transform: translateY(-1px); }
+        .btn-outline { background: var(--bg-card); color: var(--text-main); border: 1px solid #cbd5e1; }
+        .btn-outline:hover { background: #f1f5f9; }
 
-        /* The Original Outline Button */
-        .btn-outline {
-            background: var(--bg-card);
-            color: var(--text-main);
-            border: 1px solid #cbd5e1;
-        }
-        .btn-outline:hover {
-            background: #f1f5f9;
-        }
-
-        /* Sidebar Auth Buttons */
         .auth-section { margin-top: auto; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); }
         .btn-success { background: var(--brand-success); color: white; }
         .btn-danger { background: var(--brand-danger); color: white; }
         .btn-success:hover { background: #059669; }
         .btn-danger:hover { background: #DC2626; }
         .auth-btn { width: 100%; margin-bottom: 10px; }
+
+        /* ==========================================
+           6. TILLYBOT UI (Cleaned up from inline styles)
+           ========================================== */
+        .chat-toggle {
+            position: fixed; bottom: 30px; right: 30px; 
+            background: var(--bg-sidebar); color: white; 
+            border: none; border-radius: 50%; 
+            width: 60px; height: 60px; font-size: 24px; 
+            cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
+            z-index: 1000; display: flex; align-items: center; justify-content: center; 
+            transition: transform 0.2s, background 0.2s;
+        }
+        .chat-toggle:hover { transform: scale(1.05); }
+
+        .chat-window {
+            position: fixed; bottom: 100px; right: 30px; 
+            width: 350px; height: 500px; background: white; 
+            border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); 
+            z-index: 1000; display: none; flex-direction: column; 
+            overflow: hidden; border: 1px solid var(--border-color);
+        }
+
+        .chat-header {
+            background: var(--bg-sidebar); color: white; padding: 15px; 
+            font-weight: bold; font-size: 16px; display: flex; 
+            justify-content: space-between; align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1; padding: 15px; overflow-y: auto; display: flex; 
+            flex-direction: column; gap: 10px; background: var(--bg-main);
+            scroll-behavior: smooth;
+        }
+
+        .chat-input-area {
+            padding: 15px; background: white; border-top: 1px solid var(--border-color); 
+            display: flex; gap: 10px;
+        }
+
+        .chat-input-area input { margin: 0; border-radius: 20px; }
+        .chat-send-btn {
+            background: var(--bg-sidebar); color: white; border: none; 
+            padding: 10px 18px; border-radius: 20px; cursor: pointer; 
+            font-weight: 600; font-size: 14px; transition: background 0.2s;
+        }
+        .chat-send-btn:hover { background: #0f172a; }
     </style>
 </head>
 <body>
@@ -207,35 +228,33 @@
         {% block content %}
         {% endblock %}
     </main>
-    <button id="chatbot-toggle" style="position: fixed; bottom: 30px; right: 30px; background: #0f172a; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-    🤖
-</button>
 
-<div id="chatbot-window" style="position: fixed; bottom: 100px; right: 30px; width: 350px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 1000; display: none; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0;">
-    
-    <div style="background: #0f172a; color: white; padding: 15px; font-weight: bold; font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span>
-            TillyBot
+    <button id="chatbot-toggle" class="chat-toggle">🤖</button>
+
+    <div id="chatbot-window" class="chat-window">
+        <div class="chat-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span>
+                TillyBot
+            </div>
+            <button id="chatbot-close" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px;">✖</button>
         </div>
-        <button id="chatbot-close" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">✖</button>
-    </div>
 
-    <div id="chatbot-messages" style="flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f8fafc;">
-        <div style="background: #e2e8f0; color: #1e293b; padding: 10px 14px; border-radius: 12px; max-width: 80%; align-self: flex-start; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-            Hi! I'm TillyBot. Ask me about your budget pacing, or how to pay off your loans faster!
+        <div id="chatbot-messages" class="chat-messages">
+            <div style="background: #e2e8f0; color: #1e293b; padding: 10px 14px; border-radius: 12px; max-width: 80%; align-self: flex-start; font-size: 14px;">
+                Hi! I'm TillyBot. Ask me about your budget pacing, or how to pay off your loans faster!
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chatbot-input" placeholder="Ask about your finances...">
+            <button id="chatbot-send" class="chat-send-btn">Send</button>
         </div>
     </div>
 
-    <div style="padding: 15px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px;">
-        <input type="text" id="chatbot-input" placeholder="Ask about your finances..." style="flex: 1; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 20px; outline: none; font-size: 14px; transition: border-color 0.2s;" onfocus="this.style.borderColor='#0f172a'" onblur="this.style.borderColor='#cbd5e1'">
-        <button id="chatbot-send" style="background: #0f172a; color: white; border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='#1e293b'" onmouseout="this.style.background='#0f172a'">Send</button>
-    </div>
-</div>
+    {% csrf_token %}
 
-{% csrf_token %}
-
-<<script>
+<script>
     const toggleBtn = document.getElementById('chatbot-toggle');
     const closeBtn = document.getElementById('chatbot-close');
     const chatWindow = document.getElementById('chatbot-window');
@@ -243,24 +262,19 @@
     const inputField = document.getElementById('chatbot-input');
     const messagesDiv = document.getElementById('chatbot-messages');
 
-    // ==========================================
-    // NEW: Session Storage Memory
-    // ==========================================
     let chatHistory = JSON.parse(sessionStorage.getItem('tillyBotHistory')) || [];
 
-    // Load history when the page loads
     function loadHistory() {
         if (chatHistory.length > 0) {
-            messagesDiv.innerHTML = ''; // Clear default greeting
+            messagesDiv.innerHTML = ''; 
             chatHistory.forEach(msg => appendMessage(msg.text, msg.isUser, false));
         }
     }
 
-    // Toggle logic
     toggleBtn.addEventListener('click', () => {
         if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
             chatWindow.style.display = 'flex';
-            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll down when opened
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; 
         } else {
             chatWindow.style.display = 'none';
         }
@@ -283,7 +297,6 @@
         return cookieValue;
     }
 
-    // Updated: Now accepts a 'save' parameter so we don't double-save when loading
     function appendMessage(text, isUser, save = true) {
         const msgDiv = document.createElement('div');
         msgDiv.style.padding = '10px 14px';
@@ -294,23 +307,26 @@
         msgDiv.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
         
         if (isUser) {
-            msgDiv.style.background = '#0f172a'; 
+            msgDiv.style.background = 'var(--bg-sidebar)'; 
             msgDiv.style.color = 'white';
             msgDiv.style.alignSelf = 'flex-end';
             msgDiv.style.borderBottomRightRadius = '4px';
         } else {
             msgDiv.style.background = 'white'; 
-            msgDiv.style.color = '#1e293b';
+            msgDiv.style.color = 'var(--text-main)';
             msgDiv.style.alignSelf = 'flex-start';
-            msgDiv.style.border = '1px solid #e2e8f0';
+            msgDiv.style.border = '1px solid var(--border-color)';
             msgDiv.style.borderBottomLeftRadius = '4px';
-            msgDiv.innerHTML = text.replace(/\n/g, '<br>');
+            
+            // NEW: Basic Markdown Parsing for bold text
+            let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            formattedText = formattedText.replace(/\n/g, '<br>');
+            msgDiv.innerHTML = formattedText;
         }
         
         messagesDiv.appendChild(msgDiv);
         messagesDiv.scrollTop = messagesDiv.scrollHeight; 
 
-        // NEW: Save to browser memory
         if (save) {
             chatHistory.push({ text: text, isUser: isUser });
             sessionStorage.setItem('tillyBotHistory', JSON.stringify(chatHistory));
@@ -335,7 +351,7 @@
         messagesDiv.appendChild(typingDiv);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-try {
+        try {
             const response = await fetch('/api/chat/', {
                 method: 'POST',
                 headers: {
@@ -344,7 +360,7 @@ try {
                 },
                 body: JSON.stringify({ 
                     message: text,
-                    history: chatHistory // <-- NEW: Sending the memory array!
+                    history: chatHistory 
                 })
             });
 
@@ -368,7 +384,6 @@ try {
         if (e.key === 'Enter') sendMessage();
     });
 
-    // Run the load function immediately
     loadHistory();
 </script>
 </body>
