@@ -1,53 +1,95 @@
 {% extends 'finances/base.html' %}
 
 {% block content %}
-<div class="card" style="max-width: 800px; margin: 0 auto;">
+<style>
+    .budget-card {
+        padding: 24px;
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+    }
+    
+    .progress-track {
+        width: 100%; 
+        background-color: #f1f5f9; 
+        border-radius: 10px; 
+        height: 12px; 
+        overflow: hidden; 
+        margin-bottom: 15px; 
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .progress-fill {
+        height: 100%; 
+        transition: width 0.5s ease-in-out;
+    }
+
+    .empty-state-box {
+        text-align: center; 
+        padding: 60px 20px; 
+        background: var(--bg-card); 
+        border-radius: 12px; 
+        border: 2px dashed var(--border-color);
+    }
+</style>
+
+<div style="max-width: 800px; margin: 0 auto;">
+    
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h1 style="margin: 0;">Monthly Budgets</h1>
-        <a href="{% url 'add_budget' %}" class="btn btn-primary">+ Add Budget Limit</a>
+        <h1 style="margin: 0; font-size: 32px; color: var(--text-main);">Monthly Budgets</h1>
+        <a href="{% url 'add_budget' %}" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px; line-height: 1;">+</span> Add Limit
+        </a>
     </div>
-    <p style="color: var(--text-light); margin-bottom: 30px;">Track your spending against your limits for the current month.</p>
+    <p style="color: var(--text-light); margin-bottom: 30px; font-size: 16px;">Track your spending against your limits for the current month.</p>
     
     <div style="display: flex; flex-direction: column; gap: 20px;">
         {% for b in budget_data %}
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+        <div class="budget-card">
             
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
                 <div>
-                    <strong style="font-size: 18px; color: var(--text-main); display: block;">{{ b.category }}</strong>
-                    <span style="font-size: 12px; color: var(--text-light);">
-                        {{ b.start_date|date:"M d" }} - {{ b.end_date|date:"M d, Y" }}
+                    <strong style="font-size: 18px; color: var(--text-main); display: block; margin-bottom: 4px;">{{ b.category }}</strong>
+                    <span style="font-size: 13px; color: var(--text-light); font-weight: 500;">
+                        {{ b.start_date|date:"M d" }} &mdash; {{ b.end_date|date:"M d, Y" }}
                     </span>
                 </div>
                 <div style="text-align: right;">
-                    <span style="font-size: 18px; font-weight: bold; color: var(--text-main);">${{ b.spent|floatformat:2 }}</span>
-                    <span style="font-size: 14px; color: var(--text-light);"> / ${{ b.limit|floatformat:2 }}</span>
+                    <span style="font-size: 20px; font-weight: 800; color: var(--text-main);">${{ b.spent|floatformat:2 }}</span>
+                    <span style="font-size: 14px; color: var(--text-light); font-weight: 500;"> / ${{ b.limit|floatformat:2 }}</span>
                 </div>
             </div>
 
-            <div style="width: 100%; background-color: var(--border-color); border-radius: 10px; height: 12px; overflow: hidden; margin-bottom: 10px;">
-                <div style="width: {{ b.percent }}%; background-color: {{ b.status_color }}; height: 100%; transition: width 0.5s ease-in-out;"></div>
+            <div class="progress-track">
+                <div class="progress-fill" style="width: {{ b.percent }}%; background-color: {{ b.status_color }};"></div>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; gap: 10px;">
-                    <a href="{% url 'edit_budget' b.id %}" class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;">Edit</a>
-                    <a href="{% url 'delete_budget' b.id %}" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;">Delete</a>
+                    <a href="{% url 'edit_budget' b.id %}" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;">Edit</a>
+                    <a href="{% url 'delete_budget' b.id %}" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; color: var(--brand-danger); border-color: #fca5a5; background: #fef2f2;">Delete</a>
                 </div>
                 
-                <div style="font-size: 14px; font-weight: bold; color: {{ b.status_color }};">
+                <div style="font-size: 15px; font-weight: 700; color: {{ b.status_color }};">
                     {% if b.remaining < 0 %}
-                        ${{ b.over_budget|floatformat:2 }} Over Budget
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            ${{ b.over_budget|floatformat:2 }} Over Budget
+                        </span>
                     {% else %}
                         ${{ b.remaining|floatformat:2 }} Remaining
                     {% endif %}
                 </div>
             </div>
         </div>
+        
         {% empty %}
-        <div style="text-align: center; padding: 40px; background: var(--bg-card); border-radius: 8px; border: 1px dashed var(--border-color);">
-            <p style="color: var(--text-light); margin-bottom: 15px;">You haven't set up any budget limits yet.</p>
-            <p>Click the "+ Add Budget Limit" button above to get started.</p>
+        <div class="empty-state-box">
+            <svg style="color: #cbd5e1; margin-bottom: 15px;" width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            <h3 style="color: var(--text-main); margin-bottom: 8px;">No budgets set for this month</h3>
+            <p style="color: var(--text-light); margin-bottom: 20px;">Establishing limits is the first step to financial clarity.</p>
+            <a href="{% url 'add_budget' %}" class="btn btn-primary">+ Create Your First Budget</a>
         </div>
         {% endfor %}
     </div>

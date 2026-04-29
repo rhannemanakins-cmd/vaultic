@@ -1,28 +1,31 @@
 {% extends 'finances/base.html' %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 35px;">
-    <div>
-        <h1 style="margin: 0; font-size: 32px; color: var(--text-main);">Dashboard</h1>
-<div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-    <a href="?month={{ prev_month.month }}&year={{ prev_month.year }}" 
-       style="text-decoration: none; font-size: 20px; color: var(--brand-primary); font-weight: bold;">&larr;</a>
-    
-    <div style="background: var(--bg-card); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 14px; font-weight: 600;">
-        {{ start_date|date:"F Y" }}
-    </div>
+<style>
+    .ledger-row { border-bottom: 1px solid var(--border-color); transition: background 0.2s; }
+    .ledger-row:hover { background-color: #f1f5f9; }
+    .metric-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
+</style>
 
-    <a href="?month={{ next_month.month }}&year={{ next_month.year }}" 
-       style="text-decoration: none; font-size: 20px; color: var(--brand-primary); font-weight: bold;">&rarr;</a>
-</div>
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 35px;">
+    <div>
+        <h1 style="margin: 0 0 15px 0; font-size: 32px; color: var(--text-main);">Dashboard</h1>
+        
+        <div style="display: inline-flex; align-items: center; background: white; border: 1px solid var(--border-color); border-radius: 30px; padding: 4px; box-shadow: var(--shadow-sm);">
+            <a href="?month={{ prev_month.month }}&year={{ prev_month.year }}" style="padding: 6px 12px; text-decoration: none; color: var(--text-light); border-radius: 20px; transition: background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">&larr;</a>
+            <div style="padding: 0 15px; font-size: 14px; font-weight: 600; color: var(--text-main);">
+                {{ start_date|date:"F Y" }}
+            </div>
+            <a href="?month={{ next_month.month }}&year={{ next_month.year }}" style="padding: 6px 12px; text-decoration: none; color: var(--text-light); border-radius: 20px; transition: background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">&rarr;</a>
+        </div>
     </div>
     
     <div style="display: flex; gap: 12px;">
-        <a href="{% url 'export_transactions_csv' %}" class="btn btn-outline" style="display: flex; align-items: center; gap: 8px; padding: 10px 18px;">
+        <a href="{% url 'export_transactions_csv' %}" class="btn btn-outline" style="display: flex; align-items: center; gap: 8px;">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             Export CSV
         </a>
-        <a href="{% url 'add_transaction' %}" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px; padding: 10px 18px;">
+        <a href="{% url 'add_transaction' %}" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;">
             <span style="font-size: 18px; line-height: 1;">+</span> Quick Add
         </a>
     </div>
@@ -30,57 +33,66 @@
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 35px;">
     
-    <div class="card" style="border-top: 4px solid var(--brand-primary); background: white;">
+    <div class="card" style="border-top: 4px solid var(--brand-primary);">
+        <div class="metric-icon" style="background: #eff6ff; color: var(--brand-primary);">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+        </div>
         <p style="color: var(--text-light); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px 0;">Total Net Balance</p>
         <h2 style="font-size: 28px; margin: 0; color: var(--text-main);">${{ total_balance|floatformat:2 }}</h2>
     </div>
 
-    <div class="card" style="border-top: 4px solid var(--brand-success); background: white;">
+    <div class="card" style="border-top: 4px solid var(--brand-success);">
+        <div class="metric-icon" style="background: #dcfce7; color: var(--brand-success);">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+        </div>
         <p style="color: var(--text-light); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px 0;">Monthly Income</p>
         <h2 style="font-size: 28px; margin: 0; color: var(--brand-success);">${{ monthly_income|floatformat:2 }}</h2>
     </div>
 
-    <div class="card" style="border-top: 4px solid var(--brand-danger); background: white;">
+    <div class="card" style="border-top: 4px solid var(--brand-danger);">
+        <div class="metric-icon" style="background: #fee2e2; color: var(--brand-danger);">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"></path></svg>
+        </div>
         <p style="color: var(--text-light); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px 0;">Monthly Expenses</p>
         <h2 style="font-size: 28px; margin: 0; color: var(--brand-danger);">${{ monthly_expenses|floatformat:2 }}</h2>
     </div>
 </div>
 
-<div class="card" style="padding: 0; overflow: hidden; background: white;">
-    <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color);">
-        <h3 style="margin: 0; font-size: 18px; color: var(--text-main);">Recent Activity</h3>
+<div class="card" style="padding: 0; overflow: hidden;">
+    <div style="padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); background: #f8fafc;">
+        <h3 style="margin: 0; font-size: 16px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px;">Recent Activity</h3>
         <a href="{% url 'transaction_list' %}" style="color: var(--brand-primary); text-decoration: none; font-weight: 600; font-size: 14px;">View Full Ledger &rarr;</a>
     </div>
 
     <div style="overflow-x: auto;">
         <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
-                <tr style="background: #f8fafc;">
-                    <th style="padding: 12px 20px; color: var(--text-light); font-weight: 600; font-size: 12px; text-transform: uppercase;">Date</th>
-                    <th style="padding: 12px 20px; color: var(--text-light); font-weight: 600; font-size: 12px; text-transform: uppercase;">Vendor</th>
-                    <th style="padding: 12px 20px; color: var(--text-light); font-weight: 600; font-size: 12px; text-transform: uppercase;">Type</th>
-                    <th style="padding: 12px 20px; color: var(--text-light); font-weight: 600; font-size: 12px; text-transform: uppercase; text-align: right;">Amount</th>
-                    <th style="padding: 12px 20px; color: var(--text-light); font-weight: 600; font-size: 12px; text-transform: uppercase; text-align: right;">Actions</th>
+                <tr>
+                    <th style="padding: 15px 25px; color: var(--text-light); font-weight: 600; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid var(--border-color);">Date</th>
+                    <th style="padding: 15px 25px; color: var(--text-light); font-weight: 600; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid var(--border-color);">Vendor</th>
+                    <th style="padding: 15px 25px; color: var(--text-light); font-weight: 600; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid var(--border-color);">Type</th>
+                    <th style="padding: 15px 25px; color: var(--text-light); font-weight: 600; font-size: 12px; text-transform: uppercase; text-align: right; border-bottom: 2px solid var(--border-color);">Amount</th>
+                    <th style="padding: 15px 25px; color: var(--text-light); font-weight: 600; font-size: 12px; text-transform: uppercase; text-align: right; border-bottom: 2px solid var(--border-color);">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for txn in recent_transactions %}
-                <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'" onmouseout="this.style.backgroundColor='transparent'">
-                    <td style="padding: 15px 20px; font-size: 14px; color: var(--text-light);">{{ txn.date|date:"M d, Y" }}</td>
-                    <td style="padding: 15px 20px; font-weight: 600; color: var(--text-main);">{{ txn.vendor }}</td>
-                    <td style="padding: 15px 20px;">
+                <tr class="ledger-row">
+                    <td style="padding: 16px 25px; font-size: 14px; color: var(--text-light); font-weight: 500;">{{ txn.date|date:"M d, Y" }}</td>
+                    <td style="padding: 16px 25px; font-weight: 600; color: var(--text-main);">{{ txn.vendor }}</td>
+                    <td style="padding: 16px 25px;">
                         {% if txn.transaction_type == 'INCOME' %}
-                            <span style="background: #dcfce7; color: #166534; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase;">Income</span>
+                            <span style="background: #dcfce7; color: #166534; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Income</span>
                         {% elif txn.transaction_type == 'EXPENSE' %}
-                            <span style="background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase;">Expense</span>
+                            <span style="background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Expense</span>
                         {% else %}
-                            <span style="background: #e0e7ff; color: #3730a3; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase;">Transfer</span>
+                            <span style="background: #e0e7ff; color: #3730a3; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Transfer</span>
                         {% endif %}
                     </td>
-                    <td style="padding: 15px 20px; font-weight: 700; text-align: right; color: var(--text-main);">
+                    <td style="padding: 16px 25px; font-weight: 700; text-align: right; color: var(--text-main);">
                         ${{ txn.total_amount|floatformat:2 }}
                     </td>
-                    <td style="padding: 15px 20px; text-align: right;">
+                    <td style="padding: 16px 25px; text-align: right;">
                         <div style="display: flex; justify-content: flex-end; gap: 15px;">
                             <a href="{% url 'update_transaction' txn.id %}" style="color: var(--brand-primary); text-decoration: none; font-size: 13px; font-weight: 600;">Edit</a>
                             <a href="{% url 'delete_transaction' txn.id %}" style="color: var(--brand-danger); text-decoration: none; font-size: 13px; font-weight: 600;">Delete</a>
@@ -89,8 +101,8 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" style="padding: 40px; text-align: center; color: var(--text-light); font-style: italic;">
-                        No recent activity found. Click Quick Add to log your first transaction.
+                    <td colspan="5" style="padding: 60px; text-align: center; color: var(--text-light); font-size: 15px;">
+                        No recent activity found. <a href="{% url 'add_transaction' %}" style="color: var(--brand-primary); font-weight: 600; text-decoration: none;">Log your first transaction.</a>
                     </td>
                 </tr>
                 {% endfor %}
