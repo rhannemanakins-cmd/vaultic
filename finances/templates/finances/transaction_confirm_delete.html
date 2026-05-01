@@ -1,29 +1,64 @@
 {% extends 'finances/base.html' %}
 
 {% block content %}
+<style>
+    .delete-card {
+        width: 100%; 
+        max-width: 480px; 
+        text-align: center; 
+        border-top: 4px solid var(--brand-danger);
+        padding: 40px 30px;
+    }
+    .warning-icon {
+        background: #fee2e2; 
+        color: var(--brand-danger); 
+        width: 60px; 
+        height: 60px; 
+        border-radius: 50%; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        margin: 0 auto 20px auto;
+    }
+    .summary-box {
+        background: #f8fafc; 
+        padding: 18px; 
+        border-radius: 8px; 
+        margin-bottom: 30px; 
+        border: 1px solid var(--border-color); 
+        text-align: left;
+    }
+</style>
+
 <div style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
-    <div class="card" style="width: 100%; max-width: 450px; text-align: center; border-top: 4px solid var(--brand-danger);">
+    <div class="card delete-card">
         
-        <div style="background: #fee2e2; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 20px;">
-            <span style="font-size: 24px;">⚠️</span>
+        <div class="warning-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
         </div>
-        <h2 style="color: #0f172a; margin-bottom: 10px;">Delete Transaction?</h2>
-        <p style="color: var(--text-light); margin-bottom: 25px;">Are you sure you want to permanently delete this record? This will immediately affect your Total Balance and monthly charts.</p>
+        
+        <h2 style="color: var(--text-main); margin-bottom: 10px;">Delete Transaction?</h2>
+        <p style="color: var(--text-light); margin-bottom: 25px; line-height: 1.5;">
+            Are you sure you want to permanently delete this record?<br>
+            <span style="font-size: 14px;">This will immediately affect your Total Balance and monthly charts.</span>
+        </p>
 
-        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #e2e8f0; text-align: left;">
-            <p style="margin: 0; color: var(--text-main);"><strong>Vendor:</strong> {{ transaction.vendor }}</p>
-            <p style="margin: 5px 0 0; color: var(--text-main);"><strong>Date:</strong> {{ transaction.date }}</p>
-            <p style="margin: 5px 0 0; color: var(--brand-danger); font-weight: 700;"><strong>Amount:</strong> ${{ transaction.total_amount|floatformat:2 }}</p>
+        <div class="summary-box">
+            <p style="margin: 0; color: var(--text-main); font-size: 15px;"><strong>Vendor:</strong> {{ transaction.vendor }}</p>
+            <p style="margin: 8px 0 0; color: var(--text-main); font-size: 15px;"><strong>Date:</strong> {{ transaction.date|date:"F d, Y" }}</p>
+            <p style="margin: 8px 0 0; color: var(--brand-danger); font-size: 15px; font-weight: 700;"><strong>Amount:</strong> ${{ transaction.total_amount|floatformat:2 }}</p>
         </div>
 
-        <form method="post" style="display: flex; gap: 10px;">
+        <form method="post">
             {% csrf_token %}
-            <a href="javascript:history.back()" style="flex: 1; padding: 12px; background: white; color: var(--text-main); text-decoration: none; border-radius: 8px; font-weight: 600; border: 1px solid #cbd5e1; transition: background 0.2s;">
-                Cancel
-            </a>
-            <button type="submit" style="flex: 1; padding: 12px; background: var(--brand-danger); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
-                Yes, Delete It
-            </button>
+            <div style="display: flex; gap: 15px;">
+                <a href="{% url 'transaction_list' %}" class="btn btn-outline" style="flex: 1;">Cancel</a>
+                <button type="submit" class="btn btn-danger" style="flex: 1;">Yes, Delete It</button>
+            </div>
         </form>
 
     </div>

@@ -3,21 +3,21 @@ import csv
 import datetime
 import calendar
 from decimal import Decimal
-from .models import UserProfile, SavingsGoal, Debt, Budget, Transaction, TransactionLineItem
+from google import genai
+from google.genai import types
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
-from django.http import HttpResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.urls import reverse_lazy
 from django.db.models import Sum, Count, Avg
 from django.db.models.functions import TruncMonth
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic.edit import CreateView
-from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Transaction, TransactionLineItem
+from django.conf import settings
 
 from .models import Transaction, TransactionLineItem, Budget, Debt, SavingsGoal, UserProfile
 from .forms import TransactionForm, BudgetForm, DebtForm, SavingsGoalForm, ExtendedRegistrationForm
@@ -551,7 +551,7 @@ def ai_advisor_chat(request):
                 # 4. Check for Line Item Splits
                 line_items = t.line_items.all()
                 if line_items:
-                    splits = [f"{li.category} (${li.amount})" for li in line_items]
+                    splits = [f"{li.linked_budget.category} (${li.amount})" for li in line_items if li.linked_budget]
                     t_str += f" Splits: [{', '.join(splits)}]."
                 
                 transaction_context += t_str + "\n"
