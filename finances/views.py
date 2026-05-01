@@ -126,14 +126,21 @@ def budget_dashboard(request):
 # ==========================================
 class TransactionCreateView(LoginRequiredMixin, CreateView):
     model = Transaction
-    fields = ['date', 'vendor', 'total_amount', 'transaction_type', 'notes', 'linked_budget', 'linked_debt', 'linked_savings'] 
+    
+    # 1. USE THIS INSTEAD OF FIELDS!
+    form_class = TransactionForm 
+    
     template_name = 'finances/transaction_form.html'
     success_url = reverse_lazy('transaction_list') 
 
-    # NEW: Send the user's expense budgets to the HTML template
+    # 2. INJECT THE USER INTO THE FORM
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Only grab EXPENSE budgets for them to choose from
         context['user_budgets'] = Budget.objects.filter(user=self.request.user, budget_type='EXPENSE')
         return context
 
@@ -141,16 +148,15 @@ class TransactionCreateView(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         response = super().form_valid(form)
 
-        # NEW: Catch the array of Budget IDs instead of text strings
         budget_ids = self.request.POST.getlist('split_budget_id[]')
         amounts = self.request.POST.getlist('split_amount[]')
 
         for budget_id, amount in zip(budget_ids, amounts):
-            if budget_id and amount.strip(): # Ensure they actually selected a budget and typed an amount
+            if budget_id and amount.strip(): 
                 budget_instance = Budget.objects.get(id=budget_id, user=self.request.user)
                 TransactionLineItem.objects.create(
                     transaction=self.object,
-                    linked_budget=budget_instance, # Link the actual database record!
+                    linked_budget=budget_instance, 
                     amount=amount
                 )
 

@@ -7,21 +7,21 @@ from .models import Transaction, TransactionLineItem, Budget, Debt, SavingsGoal
 # ==========================================
 # TRANSACTION FORMS
 # ==========================================
+from django import forms
+from .models import Transaction, Budget, Debt, SavingsGoal
+
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
-        # Add 'linked_budget' to the fields list
-        fields = ['date', 'vendor', 'total_amount', 'transaction_type', 'linked_budget', 'linked_debt', 'linked_savings', 'notes']
-        widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'notes': forms.Textarea(attrs={'rows': 3}),
-        }
+        fields = ['date', 'vendor', 'total_amount', 'transaction_type', 'notes', 'linked_budget', 'linked_debt', 'linked_savings']
 
     def __init__(self, *args, **kwargs):
+        # Pop the user out BEFORE Django initializes the form
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+
+        # If a user was passed in, physically rewrite the database queries for these dropdowns
         if user:
-            # Add this line to filter the budget dropdown
             self.fields['linked_budget'].queryset = Budget.objects.filter(user=user)
             self.fields['linked_debt'].queryset = Debt.objects.filter(user=user)
             self.fields['linked_savings'].queryset = SavingsGoal.objects.filter(user=user)
